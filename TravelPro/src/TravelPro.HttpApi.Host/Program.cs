@@ -1,10 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using System;
+using System.Threading.Tasks;
+using Volo.Abp.AspNetCore.Mvc.Libs;
 
 namespace TravelPro;
 
@@ -40,6 +41,10 @@ public class Program
                         .WriteTo.Async(c => c.AbpStudio(services));
                 });
             await builder.AddApplicationAsync<TravelProHttpApiHostModule>();
+            builder.Services.Configure<AbpMvcLibsOptions>(options =>
+            {
+                options.CheckLibs = false;
+            });
             var app = builder.Build();
             await app.InitializeApplicationAsync();
             await app.RunAsync();
@@ -61,3 +66,4 @@ public class Program
         }
     }
 }
+//prueba

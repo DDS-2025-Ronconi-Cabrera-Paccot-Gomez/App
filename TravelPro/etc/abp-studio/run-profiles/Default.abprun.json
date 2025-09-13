@@ -2,7 +2,7 @@
   "applications": {
     "TravelPro.HttpApi.Host": {
       "type": "dotnet-project",
-      "launchUrl": "https://localhost:44342",
+      "launchUrl": "https://localhost:44380",
       "path": "../../../src/TravelPro.HttpApi.Host/TravelPro.HttpApi.Host.csproj",
       "kubernetesService": ".*-httpapihost$",
       "healthCheckEndpoint": "/health-status",
