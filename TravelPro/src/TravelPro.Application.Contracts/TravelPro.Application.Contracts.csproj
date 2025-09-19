@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TravelPro.Domain.Shared\TravelPro.Domain.Shared.csproj" />
+    <ProjectReference Include="..\TravelPro.Domain\TravelPro.Domain.csproj" />
   </ItemGroup>
   
   <ItemGroup>

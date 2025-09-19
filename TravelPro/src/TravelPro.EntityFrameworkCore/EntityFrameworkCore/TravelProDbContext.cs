@@ -12,6 +12,7 @@ using Volo.Abp.Identity.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
+using TravelPro.Destinations;
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -22,7 +23,7 @@ public class TravelProDbContext :
     IIdentityDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
-
+    public DbSet<Destination> Destinations { get; set; }
 
     #region Entities from the modules
 
@@ -69,14 +70,22 @@ public class TravelProDbContext :
         builder.ConfigureIdentity();
         builder.ConfigureOpenIddict();
         builder.ConfigureBlobStoring();
-        
-        /* Configure your own tables/entities inside here */
 
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(TravelProConsts.DbTablePrefix + "YourEntities", TravelProConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+        /* Configure your own tables/entities inside here */
+        builder.Entity<Destination>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "Destinations",
+                TravelProConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+            b.Property(x => x.Name).IsRequired().HasMaxLength(128);
+            b.OwnsOne(x => x.Coordinates);
+        });
     }
+    //builder.Entity<YourEntity>(b =>
+    //{
+    //    b.ToTable(TravelProConsts.DbTablePrefix + "YourEntities", TravelProConsts.DbSchema);
+    //    b.ConfigureByConvention(); //auto configure for the base class props
+    //    //...
+    //});
 }
+
