@@ -46,7 +46,7 @@ public class Coordinate : ValueObject
     }
 }
 
-//-----------------------------------------------------------------------------------------------------------------------//
+//---------------------------------------DATA SEED-------------------------------------------------------//
 
 public class TravelProDataSeederContributor
     : IDataSeedContributor, ITransientDependency

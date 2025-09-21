@@ -78,7 +78,16 @@ public class TravelProDbContext :
                 TravelProConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
             b.Property(x => x.Name).IsRequired().HasMaxLength(128);
-            b.OwnsOne(x => x.Coordinates);
+            b.OwnsOne(x => x.Coordinates, coord =>
+            {
+                coord.Property(c => c.Latitude)
+                     .IsRequired()
+                     .HasColumnName("Coordinates_Latitude");
+
+                coord.Property(c => c.Longitude)
+                     .IsRequired()
+                     .HasColumnName("Coordinates_Longitude");
+            });
         });
     }
     //builder.Entity<YourEntity>(b =>
