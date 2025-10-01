@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelPro.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace TravelPro.Migrations
 {
     [DbContext(typeof(TravelProDbContext))]
-    partial class TravelProDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250919201918_Created_Destination_Entity")]
+    partial class Created_Destination_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1863,13 +1866,11 @@ namespace TravelPro.Migrations
 
                             b1.Property<string>("Latitude")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Coordinates_Latitude");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Longitude")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)")
-                                .HasColumnName("Coordinates_Longitude");
+                                .HasColumnType("nvarchar(max)");
 
                             b1.HasKey("DestinationId");
 
