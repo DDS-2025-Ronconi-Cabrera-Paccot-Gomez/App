@@ -32,7 +32,10 @@ namespace TravelPro.HttpApi
                 Console.WriteLine("Resultados:");
                 foreach (var city in cities)
                 {
-                    Console.WriteLine($"{city.Name} ({city.Country}) - Población: {city.Population}");
+                    //Console.WriteLine($"{city.Name} ({city.Country}) - Población: {city.Population}");
+                    Console.WriteLine($"{city.Name} ({city.Country}) - " +
+                      $"Población: {city.Population} - " +
+                      $"Lat: {city.Coordinates.Latitude}, Lon: {city.Coordinates.Longitude}");
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TravelPro.Converters;
 using TravelPro.TravelProGeo;
 
 namespace TestGeodbCities.Infrastructure
@@ -28,12 +29,25 @@ namespace TestGeodbCities.Infrastructure
 
                 string json = await response.Content.ReadAsStringAsync();
 
-                // Definimos una clase para mapear la raíz de la respuesta
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                // acá podés ver el JSON crudo
+                //Console.WriteLine("JSON recibido:");
+                //Console.WriteLine(json);
 
+                // Definimos una clase para mapear la raíz de la respuesta
+                // Definimos opciones de serialización
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                // Registramos nuestro converter personalizado
+                options.Converters.Add(new CitySearchResultDtoConverter());
+
+                // Deserializamos la respuesta usando el converter
                 var apiResponse = JsonSerializer.Deserialize<GeoDbResponse>(json, options);
 
                 return apiResponse?.Data ?? new List<CitySearchResultDto>();
+
             }
         }
 
