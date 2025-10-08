@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TravelPro.TravelProGeo;
-using TestGeodbCities.Infrastructure;
+using TravelPro.GeoServices;
 
 namespace TravelPro.HttpApi
 {

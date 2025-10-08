@@ -1,12 +1,17 @@
-﻿using Volo.Abp.PermissionManagement;
-using Volo.Abp.SettingManagement;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TravelPro.TravelProGeo;
 using Volo.Abp.Account;
-using Volo.Abp.Identity;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
-
+using Volo.Abp.PermissionManagement;
+using Volo.Abp.SettingManagement;
+using TravelPro.TravelProGeo;
+using TravelPro.Destinations;
+using TravelPro.GeoServices;
 namespace TravelPro;
+
 
 [DependsOn(
     typeof(TravelProDomainModule),
@@ -25,5 +30,6 @@ public class TravelProApplicationModule : AbpModule
         {
             options.AddMaps<TravelProApplicationModule>();
         });
+        context.Services.AddTransient<ITravelProService,  CitySearchService>();
     }
 }
