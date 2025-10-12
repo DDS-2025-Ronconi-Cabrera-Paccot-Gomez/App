@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading.Tasks;
 using TravelPro.Destinations.Dtos;
 using TravelPro.TravelProGeo;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
-using TravelPro.TravelProGeo;
-using System.Linq;
 namespace TravelPro.Destinations;
 
-    public class CityAppService : ApplicationService
+    public class CityAppService : ApplicationService, ICityAppService
     {
         private readonly ITravelProService _citySearchService;
 
@@ -25,7 +20,12 @@ namespace TravelPro.Destinations;
 
         public async Task<ListResultDto<CityDto>> SearchCitiesAsync(SearchDestinationsInputDto input)
         {
-            var cities = await _citySearchService.SearchCitiesByNameAsync(input.PartialName);
+        if (string.IsNullOrWhiteSpace(input.PartialName))
+        {
+            return new ListResultDto<CityDto>(); // Devuelve una lista vacía inmediatamente.
+        }
+
+        var cities = await _citySearchService.SearchCitiesByNameAsync(input.PartialName);
 
         var result = cities.Select(c => new CityDto
         {
