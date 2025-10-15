@@ -30,6 +30,7 @@ public class TravelProApplicationModule : AbpModule
         {
             options.AddMaps<TravelProApplicationModule>();
         });
-        context.Services.AddTransient<ITravelProService,  CitySearchService>();
+        context.Services.AddTransient<ICitySearchAPIService,  CitySearchAPIService>();
+        context.Services.AddTransient<ICitySearchService, CitySearchService>();
     }
 }

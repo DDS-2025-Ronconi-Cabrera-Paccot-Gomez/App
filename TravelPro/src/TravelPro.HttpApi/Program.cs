@@ -12,11 +12,11 @@ namespace TravelPro.HttpApi
         {
             // Configuramos el contenedor de dependencias
             var services = new ServiceCollection();
-            services.AddTransient<ITravelProService, CitySearchService>();
+            services.AddTransient<ICitySearchAPIService, CitySearchAPIService>();
             var provider = services.BuildServiceProvider();
 
             // Obtenemos la instancia del servicio
-            var citySearchService = provider.GetRequiredService<ITravelProService>();
+            var citySearchService = provider.GetRequiredService<ICitySearchAPIService>();
 
             Console.WriteLine("Ingrese el nombre de la ciudad a buscar:");
             string cityName = Console.ReadLine();

@@ -8,7 +8,7 @@ using TravelPro.TravelProGeo;
 
 namespace TravelPro.GeoServices
 {
-    public class CitySearchService : ITravelProService
+    public class CitySearchAPIService : ICitySearchAPIService
     {
         private readonly string apiKey = "1b87288382msh04081de1250362fp1acf94jsn6c66e7e31d14";
         private readonly string baseUrl = "https://wft-geo-db.p.rapidapi.com/v1/geo";

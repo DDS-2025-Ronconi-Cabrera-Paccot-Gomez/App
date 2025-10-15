@@ -7,13 +7,14 @@ using TravelPro.Destinations.Dtos;
 using TravelPro.TravelProGeo;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.DependencyInjection;
 namespace TravelPro.Destinations;
 
-    public class CityAppService : ApplicationService, ICityAppService
-    {
-        private readonly ITravelProService _citySearchService;
+    public class CitySearchService : ApplicationService, ICitySearchService, ITransientDependency
+{
+        private readonly ICitySearchAPIService _citySearchService;
 
-        public CityAppService(ITravelProService citySearchService)
+        public CitySearchService(ICitySearchAPIService citySearchService)
         {
             _citySearchService = citySearchService;
         }

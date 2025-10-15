@@ -9,14 +9,14 @@ using Xunit;
 
 namespace TravelPro.Destinations
 {
-    public class CityAppService_IntegrationTests : TravelProEntityFrameworkCoreTestBase
+    public class CitySearchService_IntegrationTests : TravelProEntityFrameworkCoreTestBase
     {
-        private readonly ICityAppService _cityAppService; // O tu interfaz correcta
+        private readonly ICitySearchService _cityAppService; // O tu interfaz correcta
 
-        public CityAppService_IntegrationTests()
+        public CitySearchService_IntegrationTests()
         {
             // Obtenemos la implementación REAL del servicio desde el contenedor de DI
-            _cityAppService = GetRequiredService<ICityAppService>();
+            _cityAppService = GetRequiredService<ICitySearchService>();
         }
 
         // Aquí irán las pruebas de integración...

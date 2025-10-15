@@ -5,7 +5,7 @@ using Volo.Abp.Application.Services;
 
 namespace TravelPro.Destinations
 {
-    public interface ICityAppService : IApplicationService
+    public interface ICitySearchService : IApplicationService
     {
         Task<ListResultDto<CityDto>> SearchCitiesAsync(SearchDestinationsInputDto input);
     }

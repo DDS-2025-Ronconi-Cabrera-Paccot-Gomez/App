@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TravelPro.TravelProGeo
 {
-    public interface ITravelProService : Volo.Abp.DependencyInjection.ITransientDependency
+    public interface ICitySearchAPIService : Volo.Abp.DependencyInjection.ITransientDependency
     {
         /// <summary>
         /// Busca ciudades en la API GeoDB Cities por un prefijo de nombre.

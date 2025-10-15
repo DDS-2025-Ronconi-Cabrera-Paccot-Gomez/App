@@ -11,18 +11,18 @@ using NSubstitute.ExceptionExtensions;
 
 namespace TravelPro.Destinations
 {
-    public class CityAppService_UnitTests
+    public class CitySearchService_UnitTests
     {
-        private readonly ITravelProService _citySearchServiceMock;
-        private readonly CityAppService _cityAppService;
+        private readonly ICitySearchAPIService _citySearchServiceMock;
+        private readonly CitySearchService _cityAppService;
 
-        public CityAppService_UnitTests()
+        public CitySearchService_UnitTests()
         {
             // 1. Creamos nuestro Mock
-            _citySearchServiceMock = Substitute.For<ITravelProService>();
+            _citySearchServiceMock = Substitute.For<ICitySearchAPIService>();
 
             // 2. Creamos una instancia real de nuestro servicio, pero le pasamos el Mock
-            _cityAppService = new CityAppService(_citySearchServiceMock);
+            _cityAppService = new CitySearchService(_citySearchServiceMock);
         }
 
         // Aquí irán nuestras pruebas...
