@@ -1,0 +1,97 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.3.2",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "TravelPro.Application": {
+      "path": "src/TravelPro.Application/TravelPro.Application.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.Application.Tests": {
+      "path": "test/TravelPro.Application.Tests/TravelPro.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "TravelPro.Domain.Shared": {
+      "path": "src/TravelPro.Domain.Shared/TravelPro.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.Application.Contracts": {
+      "path": "src/TravelPro.Application.Contracts/TravelPro.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.HttpApi": {
+      "path": "src/TravelPro.HttpApi/TravelPro.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.HttpApi.Client": {
+      "path": "src/TravelPro.HttpApi.Client/TravelPro.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.EntityFrameworkCore.Tests": {
+      "path": "test/TravelPro.EntityFrameworkCore.Tests/TravelPro.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "TravelPro.EntityFrameworkCore": {
+      "path": "src/TravelPro.EntityFrameworkCore/TravelPro.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.TestBase": {
+      "path": "test/TravelPro.TestBase/TravelPro.TestBase.abppkg",
+      "folder": "test"
+    },
+    "TravelPro.Domain.Tests": {
+      "path": "test/TravelPro.Domain.Tests/TravelPro.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "TravelPro.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/TravelPro.HttpApi.Client.ConsoleTestApp/TravelPro.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "TravelPro.DbMigrator": {
+      "path": "src/TravelPro.DbMigrator/TravelPro.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.HttpApi.Host": {
+      "path": "src/TravelPro.HttpApi.Host/TravelPro.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "TravelPro.Domain": {
+      "path": "src/TravelPro.Domain/TravelPro.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}
