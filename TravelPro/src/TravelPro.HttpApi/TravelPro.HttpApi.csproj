@@ -6,10 +6,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>TravelPro</RootNamespace>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TravelPro.Application.Contracts\TravelPro.Application.Contracts.csproj" />
+    <ProjectReference Include="..\TravelPro.Application\TravelPro.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
