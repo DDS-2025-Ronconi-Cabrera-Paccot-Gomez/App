@@ -13,6 +13,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using TravelPro.Destinations;
+using TravelPro.Ratings;
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -24,6 +25,7 @@ public class TravelProDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     public DbSet<Destination> Destinations { get; set; }
+    public DbSet<Rating> Ratings { get; set; }
 
     #region Entities from the modules
 
@@ -72,6 +74,8 @@ public class TravelProDbContext :
         builder.ConfigureBlobStoring();
 
         /* Configure your own tables/entities inside here */
+
+        //Mapeo Destination
         builder.Entity<Destination>(b =>
         {
             b.ToTable(TravelProConsts.DbTablePrefix + "Destinations",
@@ -89,6 +93,38 @@ public class TravelProDbContext :
                      .HasColumnName("Coordinates_Longitude");
             });
         });
+
+        //Mapeo Rating
+        builder.Entity<Rating>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "Ratings",
+                TravelProConsts.DbSchema);
+            b.ConfigureByConvention(); 
+
+        
+             b.Property(x => x.Score)
+             .IsRequired();
+
+        
+            b.Property(x => x.Comment)
+             .HasMaxLength(500);
+
+            // Relaciones para genererar FK
+            b.HasOne(r => r.Destination)
+             .WithMany() 
+             .HasForeignKey(r => r.DestinationId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            b.HasOne(r => r.User)
+             .WithMany() 
+             .HasForeignKey(r => r.UserId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            //índice compuesto para evitar duplicados
+            b.HasIndex(x => new { x.DestinationId, x.UserId })
+             .IsUnique(); 
+        });
+
     }
     //builder.Entity<YourEntity>(b =>
     //{
