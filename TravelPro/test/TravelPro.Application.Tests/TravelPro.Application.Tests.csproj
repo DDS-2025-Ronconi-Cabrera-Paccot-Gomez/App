@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\TravelPro.Application.Contracts\TravelPro.Application.Contracts.csproj" />
     <ProjectReference Include="..\..\src\TravelPro.Application\TravelPro.Application.csproj" />
     <ProjectReference Include="..\..\src\TravelPro.EntityFrameworkCore\TravelPro.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\TravelPro.Domain.Tests\TravelPro.Domain.Tests.csproj" />

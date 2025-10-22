@@ -67,7 +67,7 @@ public class TravelProEntityFrameworkCoreTestModule : AbpModule
             .UseSqlite(connection)
             .Options;
 
-        using (var context = new TravelProDbContext(options))
+        using (var context = new TravelProDbContext(options, new DummyCurrentUser()))
         {
             context.GetService<IRelationalDatabaseCreator>().CreateTables();
         }
