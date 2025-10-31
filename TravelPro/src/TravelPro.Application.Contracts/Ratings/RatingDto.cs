@@ -7,8 +7,8 @@ namespace TravelPro.Ratings;
 
 public class RatingDto : AuditedEntityDto<Guid>
 {
-    public Guid DestinationId { get; private set; }
-    public Guid UserId { get; private set; }
-    public int Score { get; private set; }
-    public string? Comment { get; private set; }
+    public Guid DestinationId { get;  set; }
+    public Guid UserId { get;  set; }
+    public int Score { get;  set; }
+    public string? Comment { get;  set; }
 }

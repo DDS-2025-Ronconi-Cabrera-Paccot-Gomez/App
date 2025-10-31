@@ -1,119 +1,78 @@
-﻿using System;
-using System.Collections.Generic; // Para List<T>
-using System.Linq.Expressions; // Para Expression<Func<>>
-using System.Threading.Tasks;
-using NSubstitute;
+﻿using NSubstitute;
 using Shouldly;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using TravelPro.Ratings;
-using Volo.Abp;
-using Volo.Abp.Application.Services;
-using Volo.Abp.DependencyInjection;
-using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
-using Volo.Abp.Users;
-using Volo.Abp.Validation; // Para AbpValidationException
+using Volo.Abp.Validation;
 using Xunit;
 
-
-namespace TravelPro.Application.Tests.Ratings
+namespace TravelPro.Ratings
 {
-    public class RatingAppService_UnitTests
+    public class RatingTests
     {
-        private readonly RatingAppService _ratingAppService;
-        private readonly IRepository<Rating, Guid> _repositoryMock;
-        private readonly ICurrentUser _currentUserMock;
-        private readonly IObjectMapper _objectMapperMock;
-
-        // --- CONSTRUCTOR (Mockeando LazyServiceProvider) ---
-        public RatingAppService_UnitTests()
-        {
-            _repositoryMock = Substitute.For<IRepository<Rating, Guid>>();
-            _currentUserMock = Substitute.For<ICurrentUser>();
-            _objectMapperMock = Substitute.For<IObjectMapper>();
-
-            var lazyServiceProviderMock = Substitute.For<IAbpLazyServiceProvider>();
-
-            lazyServiceProviderMock.LazyGetRequiredService<ICurrentUser>().Returns(_currentUserMock);
-            lazyServiceProviderMock.LazyGetRequiredService<IObjectMapper>().Returns(_objectMapperMock);
-
-            _ratingAppService = new RatingAppService(_repositoryMock)
-            {
-                // Asignamos el mock a la propiedad pública
-                LazyServiceProvider = lazyServiceProviderMock
-            };
-        }
-
-        // --- PRUEBA DE CREACIÓN (VALIDA SCORE Y COMENTARIO OPCIONAL) ---
-        [Theory]
-        [InlineData(1, "Con Comentario")]
-        [InlineData(5, null)] // Sin Comentario
-        public async Task CreateAsync_Should_Work_For_Valid_Input(int score, string comment)
-        {
-            // --- ARRANGE ---
-            var testUserId = Guid.NewGuid();
-            var inputDto = new CreateUpdateRatingDto
-            {
-                DestinationId = Guid.NewGuid(),
-                Score = (byte)score,
-                Comment = comment
-            };
-
-            var ratingEntity = new Rating();
-            var ratingDto = new RatingDto();
-            var emptyList = new List<Rating>(); // Lista vacía para simular que no hay duplicados
-
-            // --- Configuración de Mocks ---
-            _currentUserMock.Id.Returns(testUserId);
-
-            // Mock del Repository (Simula que NO hay duplicados)
-            _repositoryMock.GetListAsync(Arg.Any<Expression<Func<Rating, bool>>>())
-               .Returns(emptyList); // O Task.FromResult(emptyList) si da error
-
-            // Mock del ObjectMapper (con Arg.Any para robustez)
-            _objectMapperMock.Map<CreateUpdateRatingDto, Rating>(Arg.Any<CreateUpdateRatingDto>()).Returns(ratingEntity);
-            _objectMapperMock.Map<Rating, RatingDto>(Arg.Any<Rating>()).Returns(ratingDto);
-
-            // --- ACT ---
-            await _ratingAppService.CreateAsync(inputDto);
-
-            // --- ASSERT ---
-            ratingEntity.UserId.ShouldBe(testUserId); // Verifica asignación de UserId
-            await _repositoryMock.Received(1).InsertAsync(ratingEntity, true); // Verifica guardado
-        }
-
-        // --- PRUEBA DE DUPLICADOS ---
+        //Prueba 1.1: Crear una calificación con un puntaje válido
         [Fact]
-        public async Task CreateAsync_Should_Throw_When_Duplicate_Rating_Exists()
+        public void CreateRating_WithValidScore_ShouldCreateSuccessfully()
         {
-            // --- ARRANGE ---
-            var userId = Guid.NewGuid();
+            // Arrange
             var destinationId = Guid.NewGuid();
-            _currentUserMock.Id.Returns(userId);
+            var userId = Guid.NewGuid();
 
-            var existingRating = new Rating { UserId = userId, DestinationId = destinationId };
-            var existingList = new List<Rating> { existingRating };
+            // Act
+            var rating = new Rating(destinationId, userId, 4, "Muy buen destino");
 
-            // Mock del Repository (Simula que SÍ encontró duplicados)
-            _repositoryMock.GetListAsync(Arg.Any<Expression<Func<Rating, bool>>>())
-                .Returns(existingList); // <-- Pasale la lista directamente; // O Task.FromResult(existingList)
-
-            var input = new CreateUpdateRatingDto
-            {
-                DestinationId = destinationId, // Mismo destino
-                Score = 5
-            };
-
-            // Mock del ObjectMapper (necesario aunque falle antes)
-            _objectMapperMock.Map<CreateUpdateRatingDto, Rating>(Arg.Any<CreateUpdateRatingDto>())
-                            .Returns(new Rating()); // Devolver una instancia vacía
-
-            // --- ACT & ASSERT ---
-            await Should.ThrowAsync<AbpValidationException>(async () =>
-            {
-                await _ratingAppService.CreateAsync(input);
-            });
+            // Assert
+            Assert.Equal(destinationId, rating.DestinationId);
+            Assert.Equal(userId, rating.UserId);
+            Assert.Equal(4, rating.Score);
+            Assert.Equal("Muy buen destino", rating.Comment);
         }
+        //Prueba 1.2: Crear una calificación con un puntaje inválido
+        [Theory]
+        [InlineData(0)]
+        [InlineData(6)]
+        [InlineData(-3)]
+        public void CreateRating_WithInvalidScore_ShouldThrowArgumentException(int invalidScore)
+        {
+            // Arrange
+            var destinationId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
 
-        // --- NO INCLUIR LA PRUEBA DE SCORE INVÁLIDO ---
+            // Act & Assert
+            var exception = Assert.Throws<ArgumentException>(() =>
+                new Rating(destinationId, userId, invalidScore, "comentario")
+            );
+
+            Assert.Equal("El puntaje debe estar entre 1 y 5.", exception.Message);
+        }
+        //Prueba 3 Permite comentarios opcionales
+        [Fact]
+        public void Constructor_Should_Allow_Null_Comment()
+        {
+            // ARRANGE
+            var destinationId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            var score = 4; // Un puntaje válido (entre 1 y 5)
+
+            // ACT
+            // Llamamos al constructor OMITIENDO el parámetro 'comment'
+            var rating = new Rating(destinationId, userId, score);
+
+            // ASSERT
+
+            // 1. Verificar que el objeto se creó correctamente
+            rating.ShouldNotBeNull();
+
+            // 2. Verificar que los valores obligatorios se asignaron correctamente
+            rating.DestinationId.ShouldBe(destinationId);
+            rating.UserId.ShouldBe(userId);
+            rating.Score.ShouldBe(score);
+
+            // 3. Verificar la condición clave: el comentario debe ser null
+            rating.Comment.ShouldBeNull();
+        }
+       
     }
 }

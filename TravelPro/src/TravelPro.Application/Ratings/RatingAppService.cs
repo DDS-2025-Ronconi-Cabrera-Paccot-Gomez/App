@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
@@ -35,6 +36,18 @@ public class RatingAppService :
         // lo cual es correcto (no se puede calificar sin loguearse).
         rating.UserId = CurrentUser.Id.Value;
 
+        var existingRating = await Repository.FirstOrDefaultAsync(
+        r => r.UserId == rating.UserId && r.DestinationId == rating.DestinationId
+    );
+
+        if (existingRating != null)
+        {
+            throw new BusinessException("TravelPro:DuplicateRating")
+                .WithData("UserId", rating.UserId)
+                .WithData("DestinationId", rating.DestinationId);
+        }
+
+
         // 3. Guarda en el repositorio
         await Repository.InsertAsync(rating);
 
@@ -42,4 +55,3 @@ public class RatingAppService :
         return ObjectMapper.Map<Rating, RatingDto>(rating);
     }
 }
-

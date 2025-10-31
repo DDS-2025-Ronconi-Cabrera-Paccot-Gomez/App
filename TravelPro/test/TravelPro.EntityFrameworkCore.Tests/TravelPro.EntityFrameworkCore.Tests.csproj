@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TravelPro.EntityFrameworkCore\TravelPro.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\TravelPro.Application.Tests\TravelPro.Application.Tests.csproj" />
+    <ProjectReference Include="..\TravelPro.TestBase\TravelPro.TestBase.csproj" />
   </ItemGroup>
 
   <ItemGroup>

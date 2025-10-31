@@ -1,7 +1,10 @@
-﻿using Volo.Abp.Modularity;
+﻿using Microsoft.Extensions.DependencyInjection;
+using TravelPro.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
-using TravelPro.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace TravelPro;
 
@@ -13,5 +16,5 @@ namespace TravelPro;
 )]
 public class TravelProApplicationTestModule : AbpModule
 {
-
+    
 }

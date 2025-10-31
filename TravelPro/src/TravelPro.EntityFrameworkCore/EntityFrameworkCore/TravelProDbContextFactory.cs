@@ -46,7 +46,7 @@ public class TravelProDbContextFactory : IDesignTimeDbContextFactory<TravelProDb
     private static IConfigurationRoot BuildConfiguration()
     {
         var builder = new ConfigurationBuilder()
-            .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../TravelPro.DbMigrator/"))
+            .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false);
 
         return builder.Build();
