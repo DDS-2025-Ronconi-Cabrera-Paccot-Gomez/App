@@ -5,6 +5,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Volo.Abp.AutoMapper;
 
 namespace TravelPro;
 
@@ -12,7 +13,8 @@ namespace TravelPro;
     typeof(TravelProApplicationModule),
     typeof(TravelProDomainTestModule),
     typeof(AbpPermissionManagementDomainModule),
-    typeof(AbpPermissionManagementEntityFrameworkCoreModule)
+    typeof(AbpPermissionManagementEntityFrameworkCoreModule),
+    typeof(AbpAutoMapperModule)
 )]
 public class TravelProApplicationTestModule : AbpModule
 {

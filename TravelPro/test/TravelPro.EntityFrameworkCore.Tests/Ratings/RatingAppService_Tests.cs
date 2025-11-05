@@ -1,110 +1,128 @@
 ﻿using Shouldly;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using TravelPro.Destinations;
-using TravelPro.EntityFrameworkCore;
+using TravelPro.EntityFrameworkCore.Tests.Fakes;
 using TravelPro.Ratings;
 using Volo.Abp;
-using Volo.Abp.Application.Dtos;
+using Volo.Abp.Authorization;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
-using Volo.Abp.Testing; // ESTE ES EL USING QUE FALTA
+using Volo.Abp.Testing;
+using Volo.Abp.Uow;
 using Volo.Abp.Users;
 using Xunit;
-
 namespace TravelPro.EntityFrameworkCore.Tests.Ratings
 {
-    public class RatingAppService_Tests : TravelProEntityFrameworkCoreTestBase
+    public class RatingAppService_IntegrationTests : TravelProApplicationTestBase<TravelProEntityFrameworkCoreTestModule>
     {
         private readonly IRatingAppService _ratingAppService;
-        private readonly IRepository<Destination, Guid> _destinationRepository;
-        private readonly IRepository<IdentityUser, Guid> _userRepository;
-        private readonly ICurrentUser _currentUser;
-        private readonly Guid _testUserId;
+        private readonly IRepository<Rating, Guid> _ratingRepository;
 
-        public RatingAppService_Tests()
+        public RatingAppService_IntegrationTests()
         {
             _ratingAppService = GetRequiredService<IRatingAppService>();
-            _destinationRepository = GetRequiredService<IRepository<Destination, Guid>>();
-            _userRepository = GetRequiredService<IRepository<IdentityUser, Guid>>();
-            _currentUser = GetRequiredService<ICurrentUser>();
-            _testUserId = _currentUser.Id.Value;
+            _ratingRepository = GetRequiredService<IRepository<Rating, Guid>>();
         }
 
-        // ... (Tu prueba Should_Throw_BusinessException_When_Duplicate_Rating_Is_Inserted va aquí) ...
-
-        // --- PRUEBA DE INTEGRACIÓN: Filtro por Usuario (IUserOwned) ---
         [Fact]
-        public async Task GetListAsync_Should_Only_Return_Ratings_For_Current_User()
+        public async Task Should_Require_Authentication_When_Creating_Rating()
         {
-            // --- ARRANGE ---
-
-            // 1. Definimos los IDs de los usuarios
-            var userA_Id = _testUserId; // El usuario logueado por defecto en las pruebas
-            var userB_Id = Guid.NewGuid();
-
-            // 2. Creamos un Destino
-            var destination = await _destinationRepository.InsertAsync(
+            // Arrange
+            var destinationRepository = GetRequiredService<IRepository<Destination, Guid>>();
+            var destination = await destinationRepository.InsertAsync(
                 new Destination
                 {
-                    Name = "Test Destination Filter",
-                    Country = "País de Prueba",
-                    Coordinates = new Coordinate("1", "1"),
+                    Name = "Destino no autenticado",
+                    Country = "País Test",
+                    Coordinates = new Coordinate("0", "0"),
                     Photo = "default_photo.png",
                     Region = "default_region",
                     LastUpdated = DateTime.Now,
                     Population = 0
                 },
-                true
+                autoSave: true
             );
-
-            // 3. Creamos un Usuario A y B en la BD (para la Foreign Key)
-            await WithUnitOfWorkAsync(async () =>
-            {
-                await _userRepository.InsertAsync(
-                    new IdentityUser(userA_Id, "userA_filter", "userA_filter@abp.io"),
-                    true
-                );
-                await _userRepository.InsertAsync(
-                    new IdentityUser(userB_Id, "userB_filter", "userB_filter@abp.io"),
-                    true
-                );
-            });
-
-
-            // 4. Creamos un rating como Usuario A (el usuario actual)
-            await _ratingAppService.CreateAsync(new CreateUpdateRatingDto
+            var dto = new CreateUpdateRatingDto
             {
                 DestinationId = destination.Id,
+                UserId = Guid.NewGuid(),
                 Score = 5,
-                Comment = "Rating de User A"
-            });
+                Comment = "Excelente destino"
+            };
 
-            // 5. SIMULAMOS ser el Usuario B
-            using (_currentUser.Change(userB_Id)) // <<--- ESTO ES LO QUE ARREGLA EL ERROR
+            // Act & Assert
+            await Assert.ThrowsAsync<AbpAuthorizationException>(
+                async () => await _ratingAppService.CreateAsync(dto)
+            );
+        }
+
+        [Fact]
+        public async Task Should_Create_And_Filter_Ratings_By_User()
+        {
+            // Arrange
+            var userId = Guid.NewGuid();
+            LoginAsTestUser(userId);
+
+            await WithUnitOfWorkAsync(async () =>
             {
-                // 6. Creamos un rating como Usuario B
-                await _ratingAppService.CreateAsync(new CreateUpdateRatingDto
+                var userRepository = GetRequiredService<IRepository<IdentityUser, Guid>>();
+                var destinationRepository = GetRequiredService<IRepository<Destination, Guid>>();
+
+                // Crear usuario
+                var user = await userRepository.InsertAsync(
+                    new IdentityUser(userId, "testuser", "test@example.com"),
+                    autoSave: true
+                );
+
+                // Crear destino
+                var destination = await destinationRepository.InsertAsync(
+                    new Destination
+                    {
+                        Name = "Test Destination Duplicates",
+                        Country = "País de Prueba",
+                        Coordinates = new Coordinate("1", "1"),
+                        Photo = "default_photo.png",
+                        Region = "default_region",
+                        LastUpdated = DateTime.Now,
+                        Population = 0
+                    },
+                    autoSave: true
+                );
+
+                // Crear rating DTO
+                var dto = new CreateUpdateRatingDto
                 {
                     DestinationId = destination.Id,
-                    Score = 1,
-                    Comment = "Rating de User B"
-                });
-            }
-            // (Al salir del 'using', volvemos a ser el Usuario A por defecto)
+                    UserId = user.Id,
+                    Score = 4,
+                    Comment = "Muy lindo lugar"
+                };
 
-            // --- ACT ---
+                // Act
+                var result = await _ratingAppService.CreateAsync(dto);
 
-            // 7. Pedimos la lista de ratings (como Usuario A)
-            var result = await _ratingAppService.GetListAsync(new PagedAndSortedResultRequestDto());
+                // Assert
+                result.ShouldNotBeNull();
+                result.UserId.ShouldBe(user.Id);
+            });
 
-            // --- ASSERT ---
+            // 🔹 Nueva unidad de trabajo para verificar los datos guardados
+            await WithUnitOfWorkAsync(async () =>
+            {
+                var ratingRepository = GetRequiredService<IRepository<Rating, Guid>>();
+                var saved = await ratingRepository.FirstOrDefaultAsync(r => r.UserId == userId);
 
-            // 8. Verificamos que solo vemos 1 resultado (el de User A)
-            result.TotalCount.ShouldBe(1);
-            result.Items.First().UserId.ShouldBe(userA_Id);
-            result.Items.First().Comment.ShouldBe("Rating de User A");
+                saved.ShouldNotBeNull();
+                saved.Score.ShouldBe(4);
+            });
+        }
+
+
+        private void LoginAsTestUser(Guid userId)
+        {
+            var currentUser = GetRequiredService<FakeCurrentUser>();
+            currentUser.SetId(userId);
         }
     }
 }

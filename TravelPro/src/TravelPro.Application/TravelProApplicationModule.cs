@@ -20,15 +20,17 @@ namespace TravelPro;
     typeof(AbpFeatureManagementApplicationModule),
     typeof(AbpIdentityApplicationModule),
     typeof(AbpAccountApplicationModule),
-    typeof(AbpSettingManagementApplicationModule)
+    typeof(AbpSettingManagementApplicationModule),
+     typeof(AbpAutoMapperModule)
     )]
 public class TravelProApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        context.Services.AddAutoMapperObjectMapper<TravelProApplicationModule>();
         Configure<AbpAutoMapperOptions>(options =>
         {
-            options.AddMaps<TravelProApplicationModule>();
+            options.AddMaps<TravelProApplicationModule>(validate: true);
         });
         context.Services.AddTransient<ICitySearchAPIService,  CitySearchAPIService>();
         context.Services.AddTransient<ICitySearchService, CitySearchService>();
