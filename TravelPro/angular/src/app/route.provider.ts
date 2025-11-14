@@ -17,5 +17,12 @@ function configureRoutes() {
         order: 1,
         layout: eLayoutType.application,
       },
+      {
+      path: '/destinos', // La URL (debe coincidir con la de app.routes.ts)
+      name: 'Destinos', // El texto que se verá en el menú
+      iconClass: 'fas fa-map-marked-alt', // Un ícono de mapa (puedes cambiarlo)
+      order: 2, // Para que aparezca después de 'Hogar'
+      layout: eLayoutType.application,
+    }
   ]);
 }
