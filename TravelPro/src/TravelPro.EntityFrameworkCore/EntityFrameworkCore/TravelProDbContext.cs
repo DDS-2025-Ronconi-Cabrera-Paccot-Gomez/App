@@ -13,6 +13,11 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using TravelPro.Destinations;
+using TravelPro.Ratings;
+using Volo.Abp.Users; //  NECESARIO para ICurrentUser
+using System.Linq.Expressions; //  NECESARIO para Expression
+using System; //  NECESARIO para Func<T> y Guid
+using Microsoft.EntityFrameworkCore.Metadata; //  NECESARIO para IMutableEntityType
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -24,6 +29,7 @@ public class TravelProDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     public DbSet<Destination> Destinations { get; set; }
+    public DbSet<Rating> Ratings { get; set; }
 
     #region Entities from the modules
 
@@ -49,12 +55,17 @@ public class TravelProDbContext :
     public DbSet<IdentitySession> Sessions { get; set; }
 
     #endregion
-
-    public TravelProDbContext(DbContextOptions<TravelProDbContext> options)
+    // 1. CAMPO PARA GUARDAR EL USUARIO (DE PASOS ANTERIORES)
+    private readonly ICurrentUser _currentUser;
+    // 2. CONSTRUCTOR MODIFICADO (DE PASOS ANTERIORES)
+    public TravelProDbContext(
+        DbContextOptions<TravelProDbContext> options,
+        ICurrentUser currentUser) // <-- Inyectamos ICurrentUser
         : base(options)
     {
-
+        _currentUser = currentUser; // <-- Lo guardamos
     }
+    
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -72,6 +83,8 @@ public class TravelProDbContext :
         builder.ConfigureBlobStoring();
 
         /* Configure your own tables/entities inside here */
+
+        //Mapeo Destination
         builder.Entity<Destination>(b =>
         {
             b.ToTable(TravelProConsts.DbTablePrefix + "Destinations",
@@ -89,12 +102,80 @@ public class TravelProDbContext :
                      .HasColumnName("Coordinates_Longitude");
             });
         });
+
+        //Mapeo Rating
+        builder.Entity<Rating>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "Ratings",
+                TravelProConsts.DbSchema);
+            b.ConfigureByConvention(); 
+
+        
+             b.Property(x => x.Score)
+             .IsRequired();
+
+        
+            b.Property(x => x.Comment)
+             .HasMaxLength(500);
+
+            // Relaciones para genererar FK
+            b.HasOne(r => r.Destination)
+             .WithMany() 
+             .HasForeignKey(r => r.DestinationId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            b.HasOne(r => r.User)
+             .WithMany() 
+             .HasForeignKey(r => r.UserId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            //índice compuesto para evitar duplicados
+            b.HasIndex(x => new { x.DestinationId, x.UserId })
+             .IsUnique();
+
+
+});
+
     }
+    // 3. AQUÍ VAN LOS NUEVOS MÉTODOS DEL FILTRO (DEL TUTORIAL) 
+    //    Van al final de la clase, al mismo nivel que el constructor y OnModelCreating.
+
+    protected bool IsUserOwnedFilterEnabled => DataFilter?.IsEnabled<IUserOwned>() ?? false;
+
+    protected override bool ShouldFilterEntity<TEntity>(IMutableEntityType entityType)
+    {
+        if (typeof(IUserOwned).IsAssignableFrom(typeof(TEntity)))
+        {
+            return true;
+        }
+
+        return base.ShouldFilterEntity<TEntity>(entityType);
+    }
+
+    protected override Expression<Func<TEntity, bool>> CreateFilterExpression<TEntity>(ModelBuilder modelBuilder)
+    {
+        var expression = base.CreateFilterExpression<TEntity>(modelBuilder);
+
+        if (typeof(IUserOwned).IsAssignableFrom(typeof(TEntity)))
+        {
+            Expression<Func<TEntity, bool>> userOwnedFilter =
+                e => !IsUserOwnedFilterEnabled ||
+                     !_currentUser.IsAuthenticated ||
+                     EF.Property<Guid>(e, "UserId") == _currentUser.Id;
+
+            expression = expression == null
+                ? userOwnedFilter
+                : QueryFilterExpressionHelper.CombineExpressions(expression, userOwnedFilter);
+        }
+
+        return expression;
+    }
+}
     //builder.Entity<YourEntity>(b =>
     //{
     //    b.ToTable(TravelProConsts.DbTablePrefix + "YourEntities", TravelProConsts.DbSchema);
     //    b.ConfigureByConvention(); //auto configure for the base class props
     //    //...
     //});
-}
+
 
