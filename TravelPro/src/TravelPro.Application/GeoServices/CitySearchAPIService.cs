@@ -20,7 +20,7 @@ namespace TravelPro.GeoServices
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Key", apiKey);
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Host", "wft-geo-db.p.rapidapi.com");
 
-                string url = $"{baseUrl}/cities?namePrefix={Uri.EscapeDataString(cityName)}&limit=5"; //cambiar limite de busqueda
+                string url = $"{baseUrl}/cities?namePrefix={Uri.EscapeDataString(cityName)}&limit=10&sort=-population"; //cambiar limite de busqueda
 
                 HttpResponseMessage response = await client.GetAsync(url);
 
