@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using TravelPro.TravelProGeo;
 using TravelPro.Destinations;
+using TravelPro.TravelProGeo;
+using System.Globalization;
 
 
 namespace TravelPro.Converters
@@ -25,8 +27,8 @@ namespace TravelPro.Converters
                         Country = root.GetProperty("country").GetString(),
                         Population = root.GetProperty("population").GetInt32(),
                         Coordinates = new Coordinate(
-                            root.GetProperty("latitude").GetDouble().ToString(),
-                            root.GetProperty("longitude").GetDouble().ToString()
+                            root.GetProperty("latitude").GetDouble().ToString("R", CultureInfo.InvariantCulture),
+                            root.GetProperty("longitude").GetDouble().ToString("R", CultureInfo.InvariantCulture)
                             )
                     };
                 }
