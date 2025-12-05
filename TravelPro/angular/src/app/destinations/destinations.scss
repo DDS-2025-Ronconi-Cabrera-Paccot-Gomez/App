@@ -1,0 +1,240 @@
+// Variables de colores (puedes ajustarlos a tu gusto)
+$primary-color: #0d6efd; // Azul estándar (o el de tu tema)
+$card-border-radius: 12px;
+$transition-speed: 0.3s;
+
+// --- Contenedor Principal ---
+.container-fluid {
+  padding: 2rem;
+  background-color: #f8f9fa; // Fondo gris muy suave para la página
+  min-height: 100vh;
+}
+
+// --- Tarjeta Principal (El marco del buscador) ---
+.card {
+  border: none;
+  border-radius: $card-border-radius;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1.5rem 2rem;
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #333;
+      display: flex;
+      align-items: center;
+
+      i {
+        color: $primary-color;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 2rem;
+  }
+}
+
+// --- Sección de Búsqueda ---
+.search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #f0f0f0;
+
+  .search-field {
+    flex: 1; // Ocupa todo el espacio disponible
+    min-width: 280px; // Pero no menos de esto
+
+    label {
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    input {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      font-size: 1rem;
+      transition: border-color $transition-speed;
+
+      &:focus {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+      }
+    }
+  }
+
+  .search-actions {
+    display: flex;
+    gap: 1rem;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      &.btn-primary {
+        background-color: $primary-color;
+        border-color: $primary-color;
+        box-shadow: 0 4px 6px rgba($primary-color, 0.2);
+      }
+    }
+  }
+}
+
+// --- Grid de Resultados ---
+.destinations-container {
+  position: relative;
+  min-height: 200px;
+}
+
+.destinations-grid {
+  display: grid;
+  // Crea columnas automáticamente que midan al menos 320px
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+// --- Tarjeta de Ciudad (Sin Foto) ---
+.destination-card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: $card-border-radius;
+  transition: all $transition-speed ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  
+  // Un borde superior de color para darle vida ya que no hay foto
+  border-top: 5px solid $primary-color;
+
+  &:hover {
+    transform: translateY(-5px); // Se levanta al pasar el mouse
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+  }
+
+  .destination-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .destination-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2d3436;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f1f3f5;
+  }
+
+  .destination-info {
+    flex: 1; // Empuja los botones hacia abajo
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+
+      .info-label {
+        color: #868e96;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        
+        i { width: 20px; text-align: center; } // Alinea los íconos
+      }
+
+      .info-value {
+        font-weight: 600;
+        color: #495057;
+        text-align: right;
+
+        &.coordinates {
+          font-family: 'Consolas', monospace; // Fuente tipo código para coordenadas
+          font-size: 0.85rem;
+          background: #f8f9fa;
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
+
+  .destination-actions {
+    margin-top: auto;
+    
+    button {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 6px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+      
+      &:hover {
+        background-color: $primary-color;
+        color: white;
+      }
+    }
+  }
+}
+
+// --- Estados de Carga y Vacío ---
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem;
+  z-index: 10;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #adb5bd;
+  
+  i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #e9ecef;
+  }
+  
+  h4 {
+    color: #495057;
+    font-weight: 600;
+  }
+}
