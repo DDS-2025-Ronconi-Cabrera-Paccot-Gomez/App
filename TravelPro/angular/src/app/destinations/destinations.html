@@ -1,0 +1,105 @@
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title m-0">
+        <i class="fas fa-map-marked-alt me-2"></i>
+        Buscador de Ciudades
+      </h1>
+    </div>
+
+    <div class="card-body">
+      <div class="search-container">
+        <div class="search-field">
+          <label for="search-query">Nombre de Ciudad</label>
+          <input
+            id="search-query"
+            type="text"
+            class="form-control"
+            [(ngModel)]="searchParams.partialName" (keyup.enter)="onSearch()"
+            placeholder="Buscar por nombre (ej: Buenos Aires)"
+          />
+        </div>
+
+        <div class="search-actions">
+          <button type="button" class="btn btn-primary" (click)="onSearch()">
+            <i class="fa fa-search"></i>
+            Buscar
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="clearSearch()">
+            <i class="fa fa-times"></i>
+            Limpiar
+          </button>
+        </div>
+      </div>
+
+      <div class="destinations-container">
+        <div *ngIf="loading" class="loading-overlay">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <!-- CAMBIO AQUI: usamos 'cities' en lugar de 'destinations' -->
+        <div class="destinations-grid" *ngIf="!loading && destinations.length > 0">
+          
+          <!-- CAMBIO AQUI: iteramos sobre 'cities' -->
+          <div class="destination-card" *ngFor="let city of destinations">
+
+            <div class="destination-content">
+              <h3 class="destination-name" [title]="city.name">
+                {{ city.name }}
+              </h3>
+
+              <div class="destination-info">
+                <div class="info-row">
+                  <span class="info-label">
+                    <i class="fa fa-globe me-2"></i>
+                    País:
+                  </span>
+                  <span class="info-value">{{ city.country }}</span>
+                </div>
+
+                <div class="info-row">
+                  <span class="info-label">
+                    <i class="fa fa-users me-2"></i>
+                    Población:
+                  </span>
+                  <span class="info-value">{{ formatPopulation(city.population) }}</span>
+                </div>
+
+                <div class="info-row">
+                  <span class="info-label">
+                    <i class="fa fa-map-pin me-2"></i>
+                    Coordenadas:
+                  </span>
+                  <span class="info-value coordinates">
+                    {{ formatCoordinates(city.coordinates) }} </span>
+                </div>
+              </div>
+
+              <div class="destination-actions">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="openInMaps(city)"
+                  title="Ver en Mapa"
+                >
+                  <i class="fa fa-map-marked-alt me-1"></i>
+                  Ver en Mapa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAMBIO AQUI: usamos 'cities' -->
+        <div *ngIf="!loading && destinations.length === 0" class="empty-state">
+          <i class="fa fa-search fa-3x mb-3"></i>
+          <h4>Sin resultados</h4>
+          <p>Ingresá un término de búsqueda (mínimo 3 caracteres) y presioná "Buscar".</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
