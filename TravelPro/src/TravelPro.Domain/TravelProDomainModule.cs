@@ -16,6 +16,7 @@ using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Emailing;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
+using Volo.Abp.ObjectExtending;
 
 namespace TravelPro;
 
@@ -41,6 +42,10 @@ public class TravelProDomainModule : AbpModule
         {
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
         });
+
+        ObjectExtensionManager.Instance
+                .AddOrUpdateProperty<IdentityUser, string>(
+                    "ProfilePhoto");
 
 
 #if DEBUG

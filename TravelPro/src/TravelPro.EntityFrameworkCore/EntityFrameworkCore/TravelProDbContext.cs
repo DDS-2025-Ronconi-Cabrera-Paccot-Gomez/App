@@ -135,6 +135,11 @@ public class TravelProDbContext :
 
 
 });
+        builder.Entity<IdentityUser>(b =>
+        {
+            b.Property<string>("ProfilePhoto")
+                .IsRequired(false);
+        });
 
     }
     // 3. AQUÍ VAN LOS NUEVOS MÉTODOS DEL FILTRO (DEL TUTORIAL) 
