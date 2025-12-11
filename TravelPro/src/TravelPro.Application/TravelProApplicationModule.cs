@@ -7,7 +7,6 @@ using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.SettingManagement;
-using TravelPro.TravelProGeo;
 using TravelPro.Destinations;
 using TravelPro.GeoServices;
 namespace TravelPro;
@@ -25,6 +24,10 @@ namespace TravelPro;
     )]
 public class TravelProApplicationModule : AbpModule
 {
+    public override void PreConfigureServices(ServiceConfigurationContext context)
+    {
+        TravelProDtoExtensions.Configure();
+    }
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         context.Services.AddAutoMapperObjectMapper<TravelProApplicationModule>();

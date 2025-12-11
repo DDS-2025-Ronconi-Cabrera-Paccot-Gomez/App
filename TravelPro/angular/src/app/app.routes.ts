@@ -1,8 +1,10 @@
 import { authGuard, permissionGuard } from '@abp/ng.core';
 import { Routes } from '@angular/router';
 import { Destinations } from './destinations/destinations';
+import { replaceAccountManageRoute } from './account/manage/replace.manage.routing';
 
 export const APP_ROUTES: Routes = [
+  replaceAccountManageRoute,
   {
     path: '',
     pathMatch: 'full',
@@ -10,8 +12,10 @@ export const APP_ROUTES: Routes = [
   },
   {
     path: 'account',
-    loadChildren: () => import('@abp/ng.account').then(c => c.createRoutes()),
+    loadChildren: () =>
+      import('@abp/ng.account').then(c => c.createRoutes()),
   },
+
   {
     path: 'identity',
     loadChildren: () => import('@abp/ng.identity').then(c => c.createRoutes()),
@@ -21,4 +25,10 @@ export const APP_ROUTES: Routes = [
     loadChildren: () => import('@abp/ng.setting-management').then(c => c.createRoutes()),
   },
   { path: 'destinos', component: Destinations },
+{
+  path: 'account/profile',
+  loadComponent: () =>
+    import('./account/profile/profile.component').then(m => m.ProfileComponent),
+},
+
 ];

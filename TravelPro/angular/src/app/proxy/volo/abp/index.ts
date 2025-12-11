@@ -1,2 +1,3 @@
+import * as Account from './account';
 import * as Domain from './domain';
-export { Domain };
+export { Account, Domain };
