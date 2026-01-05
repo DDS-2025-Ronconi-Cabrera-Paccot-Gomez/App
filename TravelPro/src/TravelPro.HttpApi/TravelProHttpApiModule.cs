@@ -8,6 +8,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement.HttpApi;
 using Volo.Abp.Localization;
 
+
 namespace TravelPro;
 
  [DependsOn(
@@ -23,6 +24,7 @@ public class TravelProHttpApiModule : AbpModule
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         ConfigureLocalization();
+
     }
 
     private void ConfigureLocalization()

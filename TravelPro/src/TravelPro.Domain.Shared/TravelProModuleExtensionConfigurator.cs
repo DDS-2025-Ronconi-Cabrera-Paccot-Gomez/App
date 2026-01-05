@@ -37,6 +37,21 @@ public static class TravelProModuleExtensionConfigurator
 
     private static void ConfigureExtraProperties()
     {
+            ObjectExtensionManager.Instance
+        .Modules()
+        .ConfigureIdentity(identity =>
+        {
+            identity.ConfigureUser(user =>
+            {
+                user.AddOrUpdateProperty<string>(
+                    "ProfilePhoto",
+                    options =>
+                    {
+                        
+                    }
+                );
+            });
+        });
         /* You can configure extra properties for the
          * entities defined in the modules used by your application.
          *

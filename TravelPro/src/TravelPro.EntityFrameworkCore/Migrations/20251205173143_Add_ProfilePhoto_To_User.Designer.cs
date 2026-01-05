@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelPro.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace TravelPro.Migrations
 {
     [DbContext(typeof(TravelProDbContext))]
-    partial class TravelProDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251205173143_Add_ProfilePhoto_To_User")]
+    partial class Add_ProfilePhoto_To_User
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1113,7 +1116,8 @@ namespace TravelPro.Migrations
                         .HasColumnName("PhoneNumberConfirmed");
 
                     b.Property<string>("ProfilePhoto")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.Property<string>("SecurityStamp")
                         .IsRequired()

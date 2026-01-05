@@ -44,9 +44,10 @@ namespace TravelPro.EntityFrameworkCore.Tests.Fakes
             => Roles.Contains(roleName);
 
         // Métodos utilitarios para test
-        public void SetId(Guid userId)
+        public void SetId(Guid? userId)
         {
             _id = userId;
+            
         }
 
         public void SetClaims(IEnumerable<Claim> claims)

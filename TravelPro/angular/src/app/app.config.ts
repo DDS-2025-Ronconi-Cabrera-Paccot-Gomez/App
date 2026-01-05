@@ -16,6 +16,13 @@ import { environment } from '../environments/environment';
 import { APP_ROUTES } from './app.routes';
 import { APP_ROUTE_PROVIDER } from './route.provider';
 
+
+
+
+
+
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(APP_ROUTES),
@@ -36,5 +43,6 @@ export const appConfig: ApplicationConfig = {
     provideLogo(withEnvironmentOptions(environment)),
     provideAccountConfig(),
     provideAbpThemeShared(),
+
   ]
 };

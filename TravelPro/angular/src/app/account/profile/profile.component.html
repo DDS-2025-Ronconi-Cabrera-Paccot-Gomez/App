@@ -1,0 +1,90 @@
+<div class="profile-card">
+    <h2 class="title">Mi Perfil</h2>
+
+    <!-- FOTO DE PERFIL -->
+    <div class="photo-container">
+    <img
+        [src]="profile?.extraProperties?.ProfilePhoto || 'https://via.placeholder.com/120'"
+        alt="ProfilePhoto"
+        class="photo"
+    />
+    </div>
+
+    <!-- MODO VISUALIZACIÓN -->
+  <div *ngIf="!editing" class="view-section">
+
+    <p><strong>Usuario:</strong> {{ profile?.userName }}</p>
+    <p><strong>Email:</strong> {{ profile?.email }}</p>
+    <p><strong>Nombre:</strong> {{ profile?.name }}</p>
+    <p><strong>Apellido:</strong> {{ profile?.surname }}</p>
+
+    <button class="btn btn-primary" (click)="editing = true">
+        Editar
+    </button>
+    </div>
+
+    <!-- MODO EDICIÓN -->
+  <div *ngIf="editing" class="edit-section">
+
+    <div class="form-group">
+        <label>Nombre</label>
+        <input class="form-control"
+        [(ngModel)]="profile.name"
+        (input)="validateName()" />
+        <div *ngIf="nameError" class="text-danger small">{{ nameError }}</div>
+    </div>
+
+    <div class="form-group">
+        <label>Apellido</label>
+        <input class="form-control"
+        [(ngModel)]="profile.surname"
+        (input)="validateSurname()" />
+        <div *ngIf="surnameError" class="text-danger small">{{ surnameError }}</div>
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input class="form-control"
+        [(ngModel)]="profile.email"
+        (input)="validateEmail()" />
+          <div *ngIf="emailError" class="text-danger small">
+                {{ emailError }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Foto de Perfil</label>
+        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+    </div>
+
+    <button class="btn btn-success mt-2" (click)="save()">Guardar</button>
+    <button class="btn btn-secondary mt-2" (click)="editing = false">
+        Cancelar
+    </button>
+
+    </div>
+    <!--CAMBIAR CONTRASEÑA-->
+    <div class="password-card">
+    <h3>Cambiar contraseña</h3>
+
+    <div class="form-group">
+        <label>Contraseña actual</label>
+        <input type="password" class="form-control" [(ngModel)]="password.currentPassword">
+    </div>
+
+    <div class="form-group">
+        <label>Nueva contraseña</label>
+        <input type="password" class="form-control" [(ngModel)]="password.newPassword">
+    </div>
+
+    <div class="form-group">
+        <label>Confirmar nueva contraseña</label>
+        <input type="password" class="form-control" [(ngModel)]="password.confirmPassword">
+    </div>
+
+    <button class="btn btn-warning" (click)="changePassword()">Actualizar contraseña</button>
+    <ul *ngIf="passwordErrors.length > 0" class="text-danger mt-2">
+  <li *ngFor="let err of passwordErrors">{{ err }}</li>
+</ul>
+</div>
+
+</div>
