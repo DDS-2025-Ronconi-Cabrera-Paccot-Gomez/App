@@ -2,6 +2,8 @@ import { authGuard, permissionGuard } from '@abp/ng.core';
 import { Routes } from '@angular/router';
 import { Destinations } from './destinations/destinations';
 import { replaceAccountManageRoute } from './account/manage/replace.manage.routing';
+import { PublicProfileComponent } from './users/public-profile/public-profile';
+import { UserSearchComponent } from './users/user-search/user-search';
 
 export const APP_ROUTES: Routes = [
   replaceAccountManageRoute,
@@ -29,6 +31,17 @@ export const APP_ROUTES: Routes = [
   path: 'account/profile',
   loadComponent: () =>
     import('./account/profile/profile.component').then(m => m.ProfileComponent),
+},
+{
+    path: 'users/:id', // ':id' indica que es un valor variable
+    component: PublicProfileComponent,
+    canActivate: [authGuard] // Solo usuarios logueados pueden ver perfiles
+  },
+
+  {
+  path: 'search',
+  component: UserSearchComponent,
+  canActivate: [authGuard]
 },
 
 ];
