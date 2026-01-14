@@ -1,0 +1,49 @@
+<div class="container mt-5">
+  <div class="card shadow-sm mb-5">
+    <div class="card-body p-4 text-center">
+      <h3 class="mb-3">Encuentra Compañeros de Viaje</h3>
+      
+      <div class="input-group input-group-lg mx-auto" style="max-width: 600px;">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Nombre o usuario..." 
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="search()"
+        >
+        <button class="btn btn-primary" (click)="search()" [disabled]="loading">
+          <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+          Buscar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="hasSearched && searchResults.length === 0" class="alert alert-warning text-center">
+    No encontramos ningún usuario que coincida con "<strong>{{ searchTerm }}</strong>".
+  </div>
+
+  <div class="row" *ngIf="searchResults.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let user of searchResults">
+      
+      <div class="card h-100 shadow-sm user-card" (click)="goToProfile(user.userName || '')" style="cursor: pointer;">
+        <div class="card-body text-center">
+          <img 
+            [src]="user.profilePhoto || 'assets/images/default-profile.png'" 
+            class="rounded-circle mb-3 border"
+            style="width: 80px; height: 80px; object-fit: cover;"
+          >
+          <h5 class="card-title text-primary">{{ user.name }} {{ user.surname }}</h5>
+          <p class="text-muted small">&#64;{{ user.userName }}</p>
+        </div>
+        <div class="card-footer bg-white text-center border-0 pb-3">
+          <button class="btn btn-outline-primary btn-sm rounded-pill px-4">
+            Ver Perfil
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

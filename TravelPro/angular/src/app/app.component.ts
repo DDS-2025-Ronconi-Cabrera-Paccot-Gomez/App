@@ -3,6 +3,7 @@ import { DynamicLayoutComponent } from '@abp/ng.core';
 import { LoaderBarComponent } from '@abp/ng.theme.shared';
 import { UserAvatarService } from './services/user-avatar.service';
 import { UserAvatarDirective } from './directives/avatar.directive';
+import { RoutesService, eLayoutType } from '@abp/ng.core';
 
 
 @Component({
