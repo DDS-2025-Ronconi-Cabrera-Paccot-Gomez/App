@@ -1717,6 +1717,71 @@
                   }
                 }
               ]
+            },
+            {
+              "type": "TravelPro.Users.ITravelProProfileAppService",
+              "name": "ITravelProProfileAppService",
+              "methods": [
+                {
+                  "name": "DeleteAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Void",
+                    "typeSimple": "System.Void"
+                  }
+                },
+                {
+                  "name": "GetPublicProfileAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "userId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "TravelPro.Users.Dtos.PublicProfileDto",
+                    "typeSimple": "TravelPro.Users.Dtos.PublicProfileDto"
+                  }
+                },
+                {
+                  "name": "GetPublicProfileByUserNameAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "userName",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "TravelPro.Users.Dtos.PublicProfileDto",
+                    "typeSimple": "TravelPro.Users.Dtos.PublicProfileDto"
+                  }
+                },
+                {
+                  "name": "SearchAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "filter",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Users.Dtos.PublicProfileDto>",
+                    "typeSimple": "[TravelPro.Users.Dtos.PublicProfileDto]"
+                  }
+                }
+              ]
             }
           ],
           "actions": {
@@ -1808,6 +1873,132 @@
               },
               "allowAnonymous": false,
               "implementFrom": "Volo.Abp.Account.IProfileAppService"
+            },
+            "DeleteAsync": {
+              "uniqueName": "DeleteAsync",
+              "name": "DeleteAsync",
+              "httpMethod": "DELETE",
+              "url": "api/profile",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Void",
+                "typeSimple": "System.Void"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TravelPro.Users.ITravelProProfileAppService"
+            },
+            "GetPublicProfileAsyncByUserId": {
+              "uniqueName": "GetPublicProfileAsyncByUserId",
+              "name": "GetPublicProfileAsync",
+              "httpMethod": "GET",
+              "url": "api/profile/public/{userId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "userId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "userId",
+                  "name": "userId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "TravelPro.Users.Dtos.PublicProfileDto",
+                "typeSimple": "TravelPro.Users.Dtos.PublicProfileDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TravelPro.Users.ITravelProProfileAppService"
+            },
+            "GetPublicProfileByUserNameAsyncByUserName": {
+              "uniqueName": "GetPublicProfileByUserNameAsyncByUserName",
+              "name": "GetPublicProfileByUserNameAsync",
+              "httpMethod": "GET",
+              "url": "api/profile/public/username/{userName}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "userName",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "userName",
+                  "name": "userName",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "TravelPro.Users.Dtos.PublicProfileDto",
+                "typeSimple": "TravelPro.Users.Dtos.PublicProfileDto"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TravelPro.Users.ITravelProProfileAppService"
+            },
+            "SearchAsyncByFilter": {
+              "uniqueName": "SearchAsyncByFilter",
+              "name": "SearchAsync",
+              "httpMethod": "GET",
+              "url": "api/profile/search",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "filter",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "filter",
+                  "name": "filter",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TravelPro.Users.Dtos.PublicProfileDto>",
+                "typeSimple": "[TravelPro.Users.Dtos.PublicProfileDto]"
+              },
+              "allowAnonymous": false,
+              "implementFrom": "TravelPro.Users.ITravelProProfileAppService"
             }
           }
         }
@@ -4417,6 +4608,63 @@
         },
         {
           "name": "Comment",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TravelPro.Users.Dtos.PublicProfileDto": {
+      "baseType": "Volo.Abp.Application.Dtos.EntityDto<System.Guid>",
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "UserName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Name",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Surname",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "ProfilePhoto",
           "jsonName": null,
           "type": "System.String",
           "typeSimple": "string",
