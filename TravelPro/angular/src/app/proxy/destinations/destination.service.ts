@@ -54,6 +54,15 @@ export class DestinationService {
     { apiName: this.apiName,...config });
   
 
+  sync = (id: string, input: CreateUpdateDestinationDto, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, DestinationDto>({
+      method: 'POST',
+      url: `/api/app/destination/${id}/sync`,
+      body: input,
+    },
+    { apiName: this.apiName,...config });
+  
+
   update = (id: string, input: CreateUpdateDestinationDto, config?: Partial<Rest.Config>) =>
     this.restService.request<any, DestinationDto>({
       method: 'PUT',
