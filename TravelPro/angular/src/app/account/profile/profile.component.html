@@ -86,5 +86,25 @@
   <li *ngFor="let err of passwordErrors">{{ err }}</li>
 </ul>
 </div>
+<hr class="my-5" />
 
+<div class="card border-danger mb-3 shadow-sm">
+  <div class="card-body">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h5 class="card-title text-danger">Eliminar Cuenta</h5>
+        <p class="card-text text-muted">
+          Esta acción es <strong>permanente</strong>. Una vez que elimines tu cuenta, no podrás recuperar tus datos,
+          historial de viajes ni configuraciones.
+        </p>
+      </div>
+      <div class="col-md-4 text-end">
+        <button class="btn btn-outline-danger w-100" type="button" (click)="deleteAccount()">
+          <i class="fa fa-trash me-2"></i>
+          Eliminar mi cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>

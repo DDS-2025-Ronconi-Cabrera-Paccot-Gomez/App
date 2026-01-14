@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProfileService } from '../../proxy/users/profile.service';
 import { ProfileDto, UpdateProfileDto } from '../../proxy/volo/abp/account/models';
 import { UserAvatarService } from 'src/app/services/user-avatar.service';
+import { ConfirmationService, Confirmation, ToasterService } from '@abp/ng.theme.shared';
+import { AuthService } from '@abp/ng.core';
 
 @Component({
     standalone: true,
@@ -28,7 +30,9 @@ export class ProfileComponent implements OnInit {
     nameError: string | null = null;
     surnameError: string | null = null;
 
-    constructor(private profileService: ProfileService, private avatar: UserAvatarService) {}
+    constructor(private profileService: ProfileService, private avatar: UserAvatarService,private confirmation: ConfirmationService,
+    private toaster: ToasterService,
+    private authService: AuthService) {}
 
     ngOnInit() {
         this.load();
@@ -195,5 +199,38 @@ onFileSelected(event: any) {
     reader.readAsDataURL(file);
 }
 
+deleteAccount() {
+    this.confirmation
+      .warn(
+        '', // Asegurate de que esta key exista o pon un texto fijo
+        '::AreYouSure',
+        {
+          messageLocalizationParams: [],
+          titleLocalizationParams: [],
+        }
+      )
+      .subscribe((status: Confirmation.Status) => {
+        if (status === Confirmation.Status.confirm) {
+          this.executeDelete();
+        }
+      });
+  }
+
+  private executeDelete() {
+    // Llamamos al método delete() que creamos en el backend
+    // Si TypeScript se queja de que 'delete' no existe, recuerda hacer 'abp generate-proxy -t ng'
+    this.profileService.delete().subscribe({
+      next: () => {
+        this.toaster.success('Tu cuenta ha sido eliminada correctamente.', 'Adiós');
+        
+        // Cerramos la sesión inmediatamente para limpiar tokens inválidos
+        this.authService.logout().subscribe();
+      },
+      error: (err) => {
+        console.error('Error eliminando cuenta', err);
+        this.toaster.error('Ocurrió un error al intentar eliminar la cuenta.', 'Error');
+      }
+    });
+  }
 
 }

@@ -26,7 +26,14 @@ function configureRoutes() {
       iconClass: 'fas fa-map-marked-alt', // Un ícono de mapa 
       order: 2, // Para que aparezca después de 'Hogar'
       layout: eLayoutType.application,
-    }
+    },
+    {
+        path: '/search',
+        name: 'Buscar Usuarios', // Texto que aparecerá en el menú
+        iconClass: 'fa fa-search', // Ícono de lupa
+        order: 3, // El orden: 1 es Home, 2 es Destinos (aprox), 3 irá abajo
+        layout: eLayoutType.application,
+      }
   ]);
 
 
