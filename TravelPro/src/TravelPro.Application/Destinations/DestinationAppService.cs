@@ -67,5 +67,10 @@ public class DestinationAppService :
 
         return ObjectMapper.Map<Destination, DestinationDto>(newDestination);
     }
+    public async Task<List<CountryDto>> GetCountriesAsync()
+    {
+        // Redirigimos la llamada al servicio de búsqueda inyectado
+        return await _citySearchService.GetCountriesAsync();
+    }
 
 }

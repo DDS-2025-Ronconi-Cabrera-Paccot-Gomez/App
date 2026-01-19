@@ -9,6 +9,14 @@ export interface CityDto extends AuditedEntityDto<string> {
   coordinates: Coordinate;
 }
 
+export interface CountryDto {
+  name?: string;
+  code?: string;
+}
+
 export interface SearchDestinationsInputDto {
   partialName?: string;
+  minPopulation?: number;
+  country?: string;
+  region?: string;
 }

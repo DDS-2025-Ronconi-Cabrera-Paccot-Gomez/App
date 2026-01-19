@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TravelPro.Destinations.Dtos;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 
@@ -15,4 +16,5 @@ public interface IDestinationAppService :
         CreateUpdateDestinationDto> //Used to create/update a book
 {
     Task<DestinationDto> SyncAsync(Guid id, CreateUpdateDestinationDto input);
+  
 }

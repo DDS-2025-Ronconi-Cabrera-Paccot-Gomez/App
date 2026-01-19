@@ -23,6 +23,58 @@
           />
         </div>
 
+        <div class="search-field">
+           <label>País</label>
+           <select 
+             class="form-select" 
+             [(ngModel)]="searchParams.country" 
+             (change)="onCountryChange()">
+             
+             <!-- Opción por defecto -->
+             <option value="" selected>Todos los países</option>
+             
+             <!-- Lista cargada desde el backend -->
+             <option *ngFor="let c of countries" [ngValue]="c.code">
+                {{ c.name }}
+             </option>
+             
+           </select>
+        </div>
+
+        <div class="search-field" style="max-width: 200px;">
+           <label>Región / Provincia</label>
+          <select 
+             class="form-select" 
+             [(ngModel)]="searchParams.region"
+             [disabled]="!searchParams.country || regions.length === 0"
+             (change)="onSearch()">
+             
+             <option value="" selected>Todas</option>
+             
+             <!-- Iteramos sobre la lista 'regions' que se carga al elegir país -->
+             <option *ngFor="let r of regions" [ngValue]="r.code">
+                {{ r.name }}
+             </option>
+           </select>
+        </div>
+
+        <div class="search-field" style="max-width: 220px;">
+           <label>Pob. Mínima</label>
+           <select class="form-select" [(ngModel)]="searchParams.minPopulation" (change)="onSearch()">
+              <option [ngValue]="null">Cualquiera</option>
+              <option [ngValue]="10000">10,000 (Pueblo)</option>
+              <option [ngValue]="50000">50,000 (Ciudad Pequeña)</option>
+              <option [ngValue]="100000">100,000 (Ciudad)</option>
+              <option [ngValue]="500000">500,000 (Gran Ciudad)</option>
+              <option [ngValue]="1000000">1 Millón (Metrópolis)</option>
+              <option [ngValue]="5000000">5 Millones (Mega Ciudad)</option>
+              <option [ngValue]="10000000">10 Millones</option>
+              <option [ngValue]="50000000">50 Millones</option>
+           </select>
+        </div>
+
+
+
         <div class="search-actions">
           <button type="button" class="btn btn-primary" (click)="onSearch()">
             <i class="fa fa-search"></i> Buscar
@@ -60,6 +112,12 @@
                   <span class="info-label"><i class="fa fa-globe me-2"></i> País:</span>
                   <span class="info-value">{{ city.country }}</span>
                 </div>
+
+                <div class="info-row" *ngIf="city.region">
+                  <span class="info-label"><i class="fa fa-map me-2"></i> Región:</span>
+                  <span class="info-value">{{ city.region }}</span>
+                </div>
+
 
                 <div class="info-row">
                   <span class="info-label"><i class="fa fa-users me-2"></i> Población:</span>
