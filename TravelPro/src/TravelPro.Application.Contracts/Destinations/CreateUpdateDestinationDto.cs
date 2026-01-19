@@ -28,7 +28,7 @@ public class CreateUpdateDestinationDto
     public string Country { get; set; } = string.Empty;
 
     [StringLength(128)]
-    public string Photo { get; set; } = string.Empty;
+    public string? Photo { get; set; } = string.Empty;
 
     [Required]
     public int Population { get; set; }

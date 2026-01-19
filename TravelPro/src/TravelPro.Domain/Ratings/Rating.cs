@@ -12,8 +12,8 @@ public class Rating : AuditedAggregateRoot<Guid>, IUserOwned
     public Destination Destination { get; set; }
     public Guid UserId { get; set; }
     public IdentityUser User { get; private set; }
-    public int Score { get; private set; }
-    public string? Comment { get; private set; }
+    public int Score { get; set; }
+    public string? Comment { get; set; }
 
     //Los atributos "createdAt", "updatedAt" y "deletedAt" se manejan automáticamente a través de la herencia de AuditedAggregateRoot
 

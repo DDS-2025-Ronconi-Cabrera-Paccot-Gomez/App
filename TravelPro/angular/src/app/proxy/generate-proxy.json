@@ -958,6 +958,31 @@
               "name": "IDestinationAppService",
               "methods": [
                 {
+                  "name": "SyncAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "id",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    },
+                    {
+                      "name": "input",
+                      "typeAsString": "TravelPro.Destinations.CreateUpdateDestinationDto, TravelPro.Application.Contracts",
+                      "type": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                      "typeSimple": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "TravelPro.Destinations.DestinationDto",
+                    "typeSimple": "TravelPro.Destinations.DestinationDto"
+                  }
+                },
+                {
                   "name": "GetAsync",
                   "parametersOnMethod": [
                     {
@@ -1051,6 +1076,29 @@
                   }
                 }
               ]
+            },
+            {
+              "type": "TravelPro.Destinations.ICitySearchService",
+              "name": "ICitySearchService",
+              "methods": [
+                {
+                  "name": "SearchCitiesAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "input",
+                      "typeAsString": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto, TravelPro.Application.Contracts",
+                      "type": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto",
+                      "typeSimple": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>",
+                    "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>"
+                  }
+                }
+              ]
             }
           ],
           "actions": {
@@ -1089,7 +1137,64 @@
                 "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>"
               },
               "allowAnonymous": null,
-              "implementFrom": "TravelPro.Destinations.DestinationAppService"
+              "implementFrom": "TravelPro.Destinations.ICitySearchService"
+            },
+            "SyncAsyncByIdAndInput": {
+              "uniqueName": "SyncAsyncByIdAndInput",
+              "name": "SyncAsync",
+              "httpMethod": "POST",
+              "url": "api/app/destination/{id}/sync",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "id",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                },
+                {
+                  "name": "input",
+                  "typeAsString": "TravelPro.Destinations.CreateUpdateDestinationDto, TravelPro.Application.Contracts",
+                  "type": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                  "typeSimple": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "id",
+                  "name": "id",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                },
+                {
+                  "nameOnMethod": "input",
+                  "name": "input",
+                  "jsonName": null,
+                  "type": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                  "typeSimple": "TravelPro.Destinations.CreateUpdateDestinationDto",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "Body",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "TravelPro.Destinations.DestinationDto",
+                "typeSimple": "TravelPro.Destinations.DestinationDto"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "TravelPro.Destinations.IDestinationAppService"
             },
             "CreateAsyncByInput": {
               "uniqueName": "CreateAsyncByInput",
@@ -1335,6 +1440,40 @@
               "name": "IRatingAppService",
               "methods": [
                 {
+                  "name": "GetStatsByDestinationAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "destinationId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "TravelPro.Ratings.RatingStatsDto",
+                    "typeSimple": "TravelPro.Ratings.RatingStatsDto"
+                  }
+                },
+                {
+                  "name": "GetListByDestinationAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "destinationId",
+                      "typeAsString": "System.Guid, System.Private.CoreLib",
+                      "type": "System.Guid",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Ratings.RatingDto>",
+                    "typeSimple": "[TravelPro.Ratings.RatingDto]"
+                  }
+                },
+                {
                   "name": "GetAsync",
                   "parametersOnMethod": [
                     {
@@ -1561,6 +1700,80 @@
               },
               "allowAnonymous": false,
               "implementFrom": "Volo.Abp.Application.Services.IDeleteAppService<System.Guid>"
+            },
+            "GetStatsByDestinationAsyncByDestinationId": {
+              "uniqueName": "GetStatsByDestinationAsyncByDestinationId",
+              "name": "GetStatsByDestinationAsync",
+              "httpMethod": "GET",
+              "url": "api/app/rating/stats-by-destination/{destinationId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "destinationId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "destinationId",
+                  "name": "destinationId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "TravelPro.Ratings.RatingStatsDto",
+                "typeSimple": "TravelPro.Ratings.RatingStatsDto"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "TravelPro.Ratings.IRatingAppService"
+            },
+            "GetListByDestinationAsyncByDestinationId": {
+              "uniqueName": "GetListByDestinationAsyncByDestinationId",
+              "name": "GetListByDestinationAsync",
+              "httpMethod": "GET",
+              "url": "api/app/rating/by-destination/{destinationId}",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "destinationId",
+                  "typeAsString": "System.Guid, System.Private.CoreLib",
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "destinationId",
+                  "name": "destinationId",
+                  "jsonName": null,
+                  "type": "System.Guid",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": [],
+                  "bindingSourceId": "Path",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TravelPro.Ratings.RatingDto>",
+                "typeSimple": "[TravelPro.Ratings.RatingDto]"
+              },
+              "allowAnonymous": true,
+              "implementFrom": "TravelPro.Ratings.IRatingAppService"
             },
             "GetAsyncById": {
               "uniqueName": "GetAsyncById",
@@ -4429,7 +4642,7 @@
       ]
     },
     "TravelPro.Destinations.Dtos.CityDto": {
-      "baseType": null,
+      "baseType": "Volo.Abp.Application.Dtos.AuditedEntityDto<System.Guid>",
       "isEnum": false,
       "enumNames": null,
       "enumValues": null,
@@ -4464,6 +4677,18 @@
           "jsonName": null,
           "type": "System.Int32",
           "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Region",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
@@ -4595,6 +4820,18 @@
           "regex": null
         },
         {
+          "name": "UserName",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
           "name": "Score",
           "jsonName": null,
           "type": "System.Int32",
@@ -4611,6 +4848,39 @@
           "jsonName": null,
           "type": "System.String",
           "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TravelPro.Ratings.RatingStatsDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "AverageScore",
+          "jsonName": null,
+          "type": "System.Double",
+          "typeSimple": "number",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "TotalCount",
+          "jsonName": null,
+          "type": "System.Int32",
+          "typeSimple": "number",
           "isRequired": false,
           "minLength": null,
           "maxLength": null,
