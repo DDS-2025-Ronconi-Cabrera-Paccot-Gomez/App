@@ -14,5 +14,5 @@ public interface IDestinationAppService :
         PagedAndSortedResultRequestDto, //Used for paging/sorting
         CreateUpdateDestinationDto> //Used to create/update a book
 {
-
+    Task<DestinationDto> SyncAsync(Guid id, CreateUpdateDestinationDto input);
 }

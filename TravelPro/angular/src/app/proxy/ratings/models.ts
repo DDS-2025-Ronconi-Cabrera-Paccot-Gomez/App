@@ -10,6 +10,12 @@ export interface CreateUpdateRatingDto {
 export interface RatingDto extends AuditedEntityDto<string> {
   destinationId?: string;
   userId?: string;
+  userName?: string;
   score: number;
   comment?: string;
+}
+
+export interface RatingStatsDto {
+  averageScore: number;
+  totalCount: number;
 }

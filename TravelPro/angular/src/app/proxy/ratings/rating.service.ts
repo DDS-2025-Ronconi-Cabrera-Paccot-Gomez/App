@@ -1,4 +1,4 @@
-import type { CreateUpdateRatingDto, RatingDto } from './models';
+import type { CreateUpdateRatingDto, RatingDto, RatingStatsDto } from './models';
 import { RestService, Rest } from '@abp/ng.core';
 import type { PagedAndSortedResultRequestDto, PagedResultDto } from '@abp/ng.core';
 import { Injectable } from '@angular/core';
@@ -40,6 +40,22 @@ export class RatingService {
       method: 'GET',
       url: '/api/app/rating',
       params: { sorting: input.sorting, skipCount: input.skipCount, maxResultCount: input.maxResultCount },
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getListByDestination = (destinationId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, RatingDto[]>({
+      method: 'GET',
+      url: `/api/app/rating/by-destination/${destinationId}`,
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getStatsByDestination = (destinationId: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, RatingStatsDto>({
+      method: 'GET',
+      url: `/api/app/rating/stats-by-destination/${destinationId}`,
     },
     { apiName: this.apiName,...config });
   
