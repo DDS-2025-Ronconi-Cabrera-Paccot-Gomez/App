@@ -13,6 +13,7 @@ using Volo.Abp.Users;
 using System.Linq;
 using Volo.Abp.Data;
 
+
 namespace TravelPro.Ratings;
 
 
@@ -125,40 +126,48 @@ public class RatingAppService :
     [AllowAnonymous]
     public async Task<List<RatingDto>> GetListByDestinationAsync(Guid destinationId)
     {
-        // 1. Obtener Ratings de la BD
-        var query = await Repository.GetQueryableAsync();
-        // Ordenamos por fecha de creación descendente (lo más nuevo arriba)
-        var ratings = await AsyncExecuter.ToListAsync(
-            query.Where(r => r.DestinationId == destinationId)
-                 .OrderByDescending(r => r.CreationTime)
-        );
-
-        if (!ratings.Any()) return new List<RatingDto>();
-
-        // 2. Obtener los IDs de los usuarios de esos ratings
-        var userIds = ratings.Select(x => x.UserId).Distinct().ToList();
-
-        // 3. Traer los usuarios de la tabla IdentityUsers
-        var users = await _userRepository.GetListAsync(u => userIds.Contains(u.Id));
-        var userDict = users.ToDictionary(u => u.Id, u => u.UserName);
-
-        // 4. Mapear y asignar nombres
-        var resultDtos = new List<RatingDto>();
-        foreach (var rating in ratings)
+        // 5. DESACTIVAMOS EL FILTRO AQUÍ TAMBIÉN
+        // Para que la lista traiga los comentarios de Juan, Pedro y María.
+        using (_dataFilter.Disable<IUserOwned>())
         {
-            var dto = ObjectMapper.Map<Rating, RatingDto>(rating);
+            // 1. Obtener Query
+            var query = await Repository.GetQueryableAsync();
 
-            if (userDict.ContainsKey(rating.UserId))
+            // 2. Preparar filtro
+            var queryFiltered = query
+                .Where(r => r.DestinationId == destinationId)
+                .OrderByDescending(r => r.CreationTime);
+
+            // 3. Ejecutar
+            var ratings = await AsyncExecuter.ToListAsync(queryFiltered);
+
+            if (!ratings.Any()) return new List<RatingDto>();
+
+            // 4. Obtener IDs de usuarios
+            var userIds = ratings.Select(x => x.UserId).Distinct().ToList();
+
+            // 5. Traer nombres de usuarios
+            var users = await _userRepository.GetListAsync(u => userIds.Contains(u.Id));
+            var userDict = users.ToDictionary(u => u.Id, u => u.UserName);
+
+            // 6. Mapear
+            var resultDtos = new List<RatingDto>();
+            foreach (var rating in ratings)
             {
-                dto.UserName = userDict[rating.UserId];
+                var dto = ObjectMapper.Map<Rating, RatingDto>(rating);
+
+                if (userDict.ContainsKey(rating.UserId))
+                {
+                    dto.UserName = userDict[rating.UserId];
+                }
+                else
+                {
+                    dto.UserName = "Usuario (Cuenta eliminada)";
+                }
+                resultDtos.Add(dto);
             }
-            else
-            {
-                dto.UserName = "Usuario Desconocido";
-            }
-            resultDtos.Add(dto);
+
+            return resultDtos;
         }
-
-        return resultDtos;
     }
 }

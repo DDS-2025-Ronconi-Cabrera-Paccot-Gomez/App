@@ -1,28 +1,32 @@
 ﻿using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Shouldly;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using TravelPro.Destinations.Dtos;
 using TravelPro.GeoServices;
 using TravelPro.TravelProGeo;
+using Volo.Abp.Domain.Repositories;
 using Xunit;
-using NSubstitute.ExceptionExtensions;
 
 namespace TravelPro.Destinations
 {
     public class CitySearchService_UnitTests
     {
         private readonly ICitySearchAPIService _citySearchServiceMock;
+        private readonly IRepository<Destination, Guid> _destinationRepositoryMock;
         private readonly CitySearchService _cityAppService;
 
         public CitySearchService_UnitTests()
         {
             // 1. Creamos nuestro Mock
             _citySearchServiceMock = Substitute.For<ICitySearchAPIService>();
+            _destinationRepositoryMock = Substitute.For<IRepository<Destination, Guid>>();
 
             // 2. Creamos una instancia real de nuestro servicio, pero le pasamos el Mock
-            _cityAppService = new CitySearchService(_citySearchServiceMock);
+            _cityAppService = new CitySearchService(_citySearchServiceMock, _destinationRepositoryMock);
         }
 
         // Aquí irán nuestras pruebas...
@@ -42,6 +46,10 @@ namespace TravelPro.Destinations
             _citySearchServiceMock
                 .SearchCitiesByNameAsync(partialName)
                 .Returns(Task.FromResult(fakeApiResult));
+
+            _destinationRepositoryMock
+                .GetListAsync(Arg.Any<Expression<Func<Destination, bool>>>())
+                .Returns(Task.FromResult(new List<Destination>()));
 
             // Act (Actuar)
             var result = await _cityAppService.SearchCitiesAsync(new SearchDestinationsInputDto { PartialName = partialName });
