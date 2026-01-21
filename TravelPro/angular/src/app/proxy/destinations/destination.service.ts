@@ -1,4 +1,4 @@
-import type { CityDto, CountryDto, SearchDestinationsInputDto } from './dtos/models';
+import type { CityDto, CountryDto, RegionDto, SearchDestinationsInputDto } from './dtos/models';
 import type { CreateUpdateDestinationDto, DestinationDto } from './models';
 import { RestService, Rest } from '@abp/ng.core';
 import type { ListResultDto, PagedAndSortedResultRequestDto, PagedResultDto } from '@abp/ng.core';
@@ -49,6 +49,15 @@ export class DestinationService {
       method: 'GET',
       url: '/api/app/destination',
       params: { sorting: input.sorting, skipCount: input.skipCount, maxResultCount: input.maxResultCount },
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getRegions = (countryCode: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, RegionDto[]>({
+      method: 'GET',
+      url: '/api/app/destination/regions',
+      params: { countryCode },
     },
     { apiName: this.apiName,...config });
   

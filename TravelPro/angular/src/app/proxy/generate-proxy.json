@@ -909,6 +909,23 @@
                     "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.CountryDto>",
                     "typeSimple": "[TravelPro.Destinations.Dtos.CountryDto]"
                   }
+                },
+                {
+                  "name": "GetRegionsAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "countryCode",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
+                    "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
+                  }
                 }
               ]
             }
@@ -965,6 +982,43 @@
               },
               "allowAnonymous": null,
               "implementFrom": "TravelPro.Destinations.ICitySearchService"
+            },
+            "GetRegionsAsyncByCountryCode": {
+              "uniqueName": "GetRegionsAsyncByCountryCode",
+              "name": "GetRegionsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/city-search/regions",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "countryCode",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "countryCode",
+                  "name": "countryCode",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
+                "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "TravelPro.Destinations.ICitySearchService"
             }
           }
         },
@@ -1003,6 +1057,48 @@
                   "returnValue": {
                     "type": "TravelPro.Destinations.DestinationDto",
                     "typeSimple": "TravelPro.Destinations.DestinationDto"
+                  }
+                },
+                {
+                  "name": "SearchCitiesAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "input",
+                      "typeAsString": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto, TravelPro.Application.Contracts",
+                      "type": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto",
+                      "typeSimple": "TravelPro.Destinations.Dtos.SearchDestinationsInputDto",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>",
+                    "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>"
+                  }
+                },
+                {
+                  "name": "GetCountriesAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.CountryDto>",
+                    "typeSimple": "[TravelPro.Destinations.Dtos.CountryDto]"
+                  }
+                },
+                {
+                  "name": "GetRegionsAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "countryCode",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
+                    "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
                   }
                 },
                 {
@@ -1128,6 +1224,23 @@
                     "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.CountryDto>",
                     "typeSimple": "[TravelPro.Destinations.Dtos.CountryDto]"
                   }
+                },
+                {
+                  "name": "GetRegionsAsync",
+                  "parametersOnMethod": [
+                    {
+                      "name": "countryCode",
+                      "typeAsString": "System.String, System.Private.CoreLib",
+                      "type": "System.String",
+                      "typeSimple": "string",
+                      "isOptional": false,
+                      "defaultValue": null
+                    }
+                  ],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
+                    "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
+                  }
                 }
               ]
             }
@@ -1168,7 +1281,7 @@
                 "typeSimple": "Volo.Abp.Application.Dtos.ListResultDto<TravelPro.Destinations.Dtos.CityDto>"
               },
               "allowAnonymous": null,
-              "implementFrom": "TravelPro.Destinations.ICitySearchService"
+              "implementFrom": "TravelPro.Destinations.IDestinationAppService"
             },
             "SyncAsyncByIdAndInput": {
               "uniqueName": "SyncAsyncByIdAndInput",
@@ -1240,7 +1353,44 @@
                 "typeSimple": "[TravelPro.Destinations.Dtos.CountryDto]"
               },
               "allowAnonymous": null,
-              "implementFrom": "TravelPro.Destinations.ICitySearchService"
+              "implementFrom": "TravelPro.Destinations.IDestinationAppService"
+            },
+            "GetRegionsAsyncByCountryCode": {
+              "uniqueName": "GetRegionsAsyncByCountryCode",
+              "name": "GetRegionsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/destination/regions",
+              "supportedVersions": [],
+              "parametersOnMethod": [
+                {
+                  "name": "countryCode",
+                  "typeAsString": "System.String, System.Private.CoreLib",
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null
+                }
+              ],
+              "parameters": [
+                {
+                  "nameOnMethod": "countryCode",
+                  "name": "countryCode",
+                  "jsonName": null,
+                  "type": "System.String",
+                  "typeSimple": "string",
+                  "isOptional": false,
+                  "defaultValue": null,
+                  "constraintTypes": null,
+                  "bindingSourceId": "ModelBinding",
+                  "descriptorName": ""
+                }
+              ],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
+                "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "TravelPro.Destinations.IDestinationAppService"
             },
             "CreateAsyncByInput": {
               "uniqueName": "CreateAsyncByInput",
@@ -4757,6 +4907,39 @@
       ]
     },
     "TravelPro.Destinations.Dtos.CountryDto": {
+      "baseType": null,
+      "isEnum": false,
+      "enumNames": null,
+      "enumValues": null,
+      "genericArguments": null,
+      "properties": [
+        {
+          "name": "Name",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        },
+        {
+          "name": "Code",
+          "jsonName": null,
+          "type": "System.String",
+          "typeSimple": "string",
+          "isRequired": false,
+          "minLength": null,
+          "maxLength": null,
+          "minimum": null,
+          "maximum": null,
+          "regex": null
+        }
+      ]
+    },
+    "TravelPro.Destinations.Dtos.RegionDto": {
       "baseType": null,
       "isEnum": false,
       "enumNames": null,

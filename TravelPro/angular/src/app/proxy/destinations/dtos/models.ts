@@ -14,6 +14,11 @@ export interface CountryDto {
   code?: string;
 }
 
+export interface RegionDto {
+  name?: string;
+  code?: string;
+}
+
 export interface SearchDestinationsInputDto {
   partialName?: string;
   minPopulation?: number;

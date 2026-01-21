@@ -16,5 +16,9 @@ public interface IDestinationAppService :
         CreateUpdateDestinationDto> //Used to create/update a book
 {
     Task<DestinationDto> SyncAsync(Guid id, CreateUpdateDestinationDto input);
-  
+
+    Task<ListResultDto<CityDto>> SearchCitiesAsync(SearchDestinationsInputDto input);
+    Task<List<CountryDto>> GetCountriesAsync();
+    Task<List<RegionDto>> GetRegionsAsync(string countryCode);
+
 }

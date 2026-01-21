@@ -42,7 +42,7 @@ namespace TravelPro.Destinations
                 Country = c.Country,
                 Coordinates = c.Coordinates,
                 Population = c.Population,
-                Region = c.Region 
+                Region = c.Region
             }).ToList();
 
             // C) LÓGICA DE CRUCE: Buscar coincidencias en la BD Local
@@ -76,6 +76,12 @@ namespace TravelPro.Destinations
         {
             // Delegamos la llamada al servicio de infraestructura (API Externa)
             return await _citySearchService.GetCountriesAsync();
+        }
+
+        public async Task<List<RegionDto>> GetRegionsAsync(string countryCode)
+        {
+            // Delegamos la llamada al servicio de infraestructura (API Externa)
+            return await _citySearchService.GetRegionsAsync(countryCode);
         }
     }
 }

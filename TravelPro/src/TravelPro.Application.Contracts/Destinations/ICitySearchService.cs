@@ -11,6 +11,7 @@ namespace TravelPro.Destinations
     {
         Task<ListResultDto<CityDto>> SearchCitiesAsync(SearchDestinationsInputDto input);
         Task<List<CountryDto>> GetCountriesAsync();
+        Task<List<RegionDto>> GetRegionsAsync(string countryCode);
 
     }
 }

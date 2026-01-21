@@ -69,6 +69,7 @@ namespace TravelPro.GeoServices
                     }
                 }
                 // --- 2. CONSTRUCCIÓN DE LA URL ---
+                string url;
                 string queryParams = $"?limit=10&sort=-population";
 
                 if (!string.IsNullOrWhiteSpace(input.PartialName))
@@ -79,22 +80,30 @@ namespace TravelPro.GeoServices
                  queryParams += $"&minPopulation={input.MinPopulation.Value}";
 
                 // AQUÍ SE APLICA EL FILTRO
-                if (!string.IsNullOrEmpty(countryId))
+                if (!string.IsNullOrEmpty(countryId) &&
+                    !string.IsNullOrEmpty(regionCode) &&
+                    !regionCode.Contains(","))
                 {
-                    queryParams += $"&countryIds={countryId}";
+                    url = $"{baseUrl}/countries/{countryId}/regions/{regionCode}/cities{queryParams}";
+                    //queryParams += $"&countryIds={countryId}";
                 }
 
-                if (!string.IsNullOrEmpty(regionCode))
-                    queryParams += $"&regionCode={Uri.EscapeDataString(regionCode)}";
-                if (!string.IsNullOrWhiteSpace(input.Region))
-                 queryParams += $"&regionCode={Uri.EscapeDataString(input.Region)}";
+                else
+                {
+                    if (!string.IsNullOrEmpty(countryId))
+                        queryParams += $"&countryIds={countryId}";
 
-                string url = $"{baseUrl}/cities{queryParams}";
+                    // Nota: Aquí mantenemos 'regionCodes' por si acaso cae en el else
+                    if (!string.IsNullOrEmpty(regionCode))
+                        queryParams += $"&regionCodes={Uri.EscapeDataString(regionCode)}";
+                    else if (!string.IsNullOrWhiteSpace(input.Region) && input.Region.Length <= 3)
+                        queryParams += $"&regionCodes={Uri.EscapeDataString(input.Region.Trim().ToUpper())}";
 
-                // --- 3. DIAGNÓSTICO (LOG EN CONSOLA) ---
-                // Esto aparecerá en la ventana negra del servidor. 
-                // Verificalo para asegurarte de que "&countryIds=AR" esté presente.
-                Console.WriteLine($"[API GEO] Buscando: {url}");
+                    url = $"{baseUrl}/cities{queryParams}";
+                }
+
+
+
 
                 // --- 4. EJECUCIÓN ---
                 HttpResponseMessage response = await client.GetAsync(url);
@@ -106,7 +115,26 @@ namespace TravelPro.GeoServices
                 options.Converters.Add(new CitySearchResultDtoConverter());
 
                 var apiResponse = JsonSerializer.Deserialize<GeoDbResponse>(json, options);
-                return apiResponse?.Data ?? new List<CitySearchResultDto>();
+ 
+            
+                var cities = apiResponse?.Data ?? new List<CitySearchResultDto>();
+
+               
+                foreach (var city in cities)
+                {
+                    if (string.IsNullOrWhiteSpace(city.Country))
+                    {
+                        city.Country = input.Country; 
+                    }
+
+                    if (string.IsNullOrWhiteSpace(city.Region))
+                    {
+                        city.Region = input.Region; 
+                    }
+                }
+
+               
+                return cities;
             }
         }
         public async Task<List<CountryDto>> GetCountriesAsync()
@@ -360,8 +388,37 @@ namespace TravelPro.GeoServices
 
         public async Task<List<RegionDto>> GetRegionsAsync(string countryCode)
         {
-            // ... Tu código del dropdown de regiones ...
-            return new List<RegionDto>();
+            if (string.IsNullOrWhiteSpace(countryCode)) return new List<RegionDto>();
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("X-RapidAPI-Key", apiKey);
+                client.DefaultRequestHeaders.Add("X-RapidAPI-Host", apiHost);
+
+                // Llamamos al endpoint de regiones de un país
+                string url = $"{baseUrl}/countries/{countryCode}/regions?limit=10";
+
+                var response = await client.GetAsync(url);
+                if (!response.IsSuccessStatusCode) return new List<RegionDto>();
+
+                var json = await response.Content.ReadAsStringAsync();
+                var regions = new List<RegionDto>();
+
+                using (var doc = JsonDocument.Parse(json))
+                {
+                    var data = doc.RootElement.GetProperty("data");
+                    foreach (var element in data.EnumerateArray())
+                    {
+                        regions.Add(new RegionDto
+                        {
+                            // GeoDB usa 'isoCode' o 'name'
+                            Code = element.TryGetProperty("isoCode", out var iso) ? iso.GetString() : "",
+                            Name = element.GetProperty("name").GetString()
+                        });
+                    }
+                }
+                return regions.OrderBy(r => r.Name).ToList();
+            }
         }
         // Clase auxiliar para mapear la respuesta de la API
         private class GeoDbResponse

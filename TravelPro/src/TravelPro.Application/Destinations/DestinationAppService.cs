@@ -8,6 +8,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TravelPro.Destinations;
 public class DestinationAppService :
@@ -71,6 +72,13 @@ public class DestinationAppService :
     {
         // Redirigimos la llamada al servicio de búsqueda inyectado
         return await _citySearchService.GetCountriesAsync();
+    }
+
+    [HttpGet("api/app/destination/regions")] // Forzamos la ruta exacta
+    public async Task<List<RegionDto>> GetRegionsAsync(string countryCode)
+    {
+        // Delegamos al servicio de la API externa
+        return await _citySearchService.GetRegionsAsync(countryCode);
     }
 
 }

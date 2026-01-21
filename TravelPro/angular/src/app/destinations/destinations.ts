@@ -83,37 +83,39 @@ export class Destinations implements OnInit {
     });
   }
 
-  // CORREGIDO: Usamos RestService para cargar regiones y desbloquear el menú
+
   onCountryChange(): void {
-    this.searchParams.region = ''; 
-    this.regions = [];
+  // 1. Limpiamos selección previa
+  this.searchParams.region = ''; 
+  this.regions = [];
 
-    if (!this.searchParams.country) {
-      this.onSearch();
-      return;
-    }
-
-    this.loading = true;
-    
-    // Llamada manual al endpoint de regiones en DestinationAppService
-    this.restService.request<any, RegionDto[]>({
-      method: 'GET',
-      url: '/api/app/destination/regions', 
-      params: { countryCode: this.searchParams.country }
-    })
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: (list) => {
-          this.regions = list;
-          this.onSearch();
-        },
-        error: (err) => {
-          console.error('Error cargando regiones:', err);
-          // Si falla, intentamos buscar igual sin regiones para no bloquear al usuario
-          this.onSearch(); 
-        }
-      });
+  if (!this.searchParams.country) {
+    this.onSearch();
+    return;
   }
+
+  this.loading = true;
+  
+  // 2. USAMOS EL PROXY (Asegúrate de que el método se llame getRegions o getRegionsAsync)
+  // El proxy ya sabe la URL y el parámetro countryCode
+  this.destinationService.getRegions(this.searchParams.country)
+    .pipe(finalize(() => this.loading = false))
+    .subscribe({
+      next: (list) => {
+        // Asignamos las regiones recibidas
+        this.regions = list || [];
+        console.log('Regiones cargadas:', this.regions);
+        
+        // 3. EJECUTAMOS LA BÚSQUEDA AUTOMÁTICA
+        // Forzamos que se dispare la búsqueda de ciudades apenas cambia el país
+        this.onSearch();
+      },
+      error: (err) => {
+        console.error('Error cargando regiones:', err);
+        this.onSearch(); 
+      }
+    });
+}
 
   private loadCities(): void {
     const hasName = this.searchParams.partialName && this.searchParams.partialName.length >= 3;
