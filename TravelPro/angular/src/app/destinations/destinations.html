@@ -31,10 +31,10 @@
              (change)="onCountryChange()">
              
              <!-- Opción por defecto -->
-             <option value="" selected>Todos los países</option>
+             <option value="">Todos los países</option>
              
              <!-- Lista cargada desde el backend -->
-             <option *ngFor="let c of countries" [ngValue]="c.code">
+             <option *ngFor="let c of countries" [value]="c.code">
                 {{ c.name }}
              </option>
              
@@ -84,7 +84,7 @@
           </button>
         </div>
       </div>
-
+      
       <div class="destinations-container">
         
         <div *ngIf="loading" class="loading-overlay">

@@ -64,7 +64,6 @@ namespace TravelPro.GeoServices
                         {
                             // Unimos los códigos con comas (ej: "CL,CM")
                             regionCode = string.Join(",", codes);
-                            Console.WriteLine($"[GEO SEARCH] Región '{cleanRegion}' mapeada a: {regionCode}");
                         }
                     }
                 }
@@ -124,12 +123,12 @@ namespace TravelPro.GeoServices
                 {
                     if (string.IsNullOrWhiteSpace(city.Country))
                     {
-                        city.Country = input.Country; 
+                        city.Country = input.CountryName; 
                     }
 
                     if (string.IsNullOrWhiteSpace(city.Region))
                     {
-                        city.Region = input.Region; 
+                        city.Region = input.RegionName; 
                     }
                 }
 
@@ -398,10 +397,26 @@ namespace TravelPro.GeoServices
                 // Llamamos al endpoint de regiones de un país
                 string url = $"{baseUrl}/countries/{countryCode}/regions?limit=10";
 
+
                 var response = await client.GetAsync(url);
-                if (!response.IsSuccessStatusCode) return new List<RegionDto>();
+
+                // LOG DE EMERGENCIA:
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"[EXTERNAL API] Status: {response.StatusCode} para la URL: {url}");
+                if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    Console.WriteLine(" ¡TE ESTÁN BLOQUEANDO POR VELOCIDAD (Error 429)!");
+                }
+                Console.ResetColor();
+
+                if (!response.IsSuccessStatusCode) {
+                    return new List<RegionDto>(); 
+                }
 
                 var json = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[EXTERNAL API] Body: {json}");
+
                 var regions = new List<RegionDto>();
 
                 using (var doc = JsonDocument.Parse(json))

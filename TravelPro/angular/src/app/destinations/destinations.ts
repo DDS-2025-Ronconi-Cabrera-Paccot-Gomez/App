@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 // Importamos RestService para llamadas manuales seguras
 import { ListResultDto, CoreModule, ConfigStateService, RestService } from '@abp/ng.core';
-import { finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { switchMap, delay, tap, catchError, finalize, debounceTime } from 'rxjs/operators';
 
 // Proxies
 import { DestinationService } from '../proxy/destinations/destination.service';
@@ -36,11 +37,13 @@ export class Destinations implements OnInit {
   private readonly modalService = inject(NgbModal);
   private readonly configState = inject(ConfigStateService);
   private readonly restService = inject(RestService); // Inyectamos RestService
+  private searchTrigger$ = new Subject<void>();
 
   destinations: CityDto[] = []; 
   countries: CountryDto[] = [];
   regions: RegionDto[] = []; 
   loading = false;
+
 
   searchParams: SearchDestinationsInputDto = {
     partialName: '',
@@ -67,7 +70,48 @@ export class Destinations implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadCountries();
+    this.searchTrigger$.pipe(
+    debounceTime(1200),
+    switchMap(() => {
+      if (!this.searchParams.country) {
+        return of({ items: [] });
+    }
+      this.loading = true;
+      // Sincronizamos nombres antes de la petición
+      const countryObj = this.countries.find(c => c.code === this.searchParams.country);
+      const regionObj = this.regions.find(r => r.code === this.searchParams.region);
+      const requestPayload = {
+      ...this.searchParams,
+      _version: new Date().getTime(),
+      // Si está vacío, enviamos null. Esto suele ser la clave.
+      region: this.searchParams.region || null, 
+      minPopulation: this.searchParams.minPopulation || null,
+      countryName: countryObj ? countryObj.name : '',
+      regionName: regionObj ? regionObj.name : ''
+      
+    };
+
+    return this.destinationService.searchCities(requestPayload).pipe(
+        // CatchError aquí para que si falla una vez, el gatillo siga vivo para la próxima
+        catchError(error => {
+            console.error("❌ Error en la API:", error);
+            this.loading = false;
+            return of({ items: [] });
+        })
+      );
+
+    })
+  ).subscribe({
+    next: (res) => {
+      this.destinations = res.items || [];
+      this.loading = false;
+      if (this.destinations.length > 0) this.loadExtrasForCities();
+    },
+    error: () => this.loading = false
+  });
+
+  // 2. SEGUNDO: Cargamos los países para que el selector se llene al iniciar
+  this.loadCountries();
   }
 
   // CORREGIDO: Usamos RestService para asegurar la carga de países
@@ -84,40 +128,36 @@ export class Destinations implements OnInit {
   }
 
 
-  onCountryChange(): void {
+onCountryChange(): void {
   // 1. Limpiamos selección previa
   this.searchParams.region = ''; 
+  this.searchParams.regionName = ''; 
   this.regions = [];
 
   if (!this.searchParams.country) {
-    this.onSearch();
+    this.searchTrigger$.next();
+    //this.onSearch();
     return;
   }
 
-  this.loading = true;
-  
-  // 2. USAMOS EL PROXY (Asegúrate de que el método se llame getRegions o getRegionsAsync)
-  // El proxy ya sabe la URL y el parámetro countryCode
   this.destinationService.getRegions(this.searchParams.country)
-    .pipe(finalize(() => this.loading = false))
     .subscribe({
       next: (list) => {
-        // Asignamos las regiones recibidas
         this.regions = list || [];
-        console.log('Regiones cargadas:', this.regions);
-        
-        // 3. EJECUTAMOS LA BÚSQUEDA AUTOMÁTICA
-        // Forzamos que se dispare la búsqueda de ciudades apenas cambia el país
-        this.onSearch();
+        setTimeout(() => {
+        this.searchTrigger$.next();
+      }, 100);
       },
       error: (err) => {
-        console.error('Error cargando regiones:', err);
-        this.onSearch(); 
+        console.error("❌ Error cargando regiones", err);
+        this.searchTrigger$.next()
       }
     });
 }
 
-  private loadCities(): void {
+
+
+  /*private loadCities(): void {
     const hasName = this.searchParams.partialName && this.searchParams.partialName.length >= 3;
     const hasCountry = this.searchParams.country && this.searchParams.country.length >= 2;
     const hasPop = this.searchParams.minPopulation && this.searchParams.minPopulation > 0;
@@ -144,11 +184,43 @@ export class Destinations implements OnInit {
           this.destinations = [];
         },
       });
-  }
+  }*/
 
-  onSearch(): void {
-    this.loadCities();
-  }
+
+onSearch(): void {
+ /* const selectedCountryObj = this.countries.find(c => c.code === this.searchParams.country);
+  const selectedRegionObj = this.regions.find(r => r.code === this.searchParams.region);
+
+  this.searchParams.countryName = selectedCountryObj ? selectedCountryObj.name : '';
+  this.searchParams.regionName = selectedRegionObj ? selectedRegionObj.name : '';
+
+  const cleanParams = JSON.parse(JSON.stringify(this.searchParams));
+  if (!cleanParams.region) delete cleanParams.region; 
+  if (!cleanParams.minPopulation) delete cleanParams.minPopulation;
+
+  this.loading = true;
+  this.destinations = [];
+
+console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
+
+  this.destinationService.searchCities(this.searchParams)
+    .pipe(finalize(() => this.loading = false))
+    .subscribe({
+      next: (res) => {
+        console.log("📥 Resultados obtenidos:", res.items?.length || 0);
+        this.destinations = res.items || [];
+        //Cargamos las estrellas y reseñas también en búsquedas automáticas
+        if (this.destinations.length > 0) {
+          this.loadExtrasForCities();
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.destinations = [];
+      }
+    });*/
+    this.searchTrigger$.next()
+}
 
   clearSearch(): void {
     this.searchParams.partialName = '';

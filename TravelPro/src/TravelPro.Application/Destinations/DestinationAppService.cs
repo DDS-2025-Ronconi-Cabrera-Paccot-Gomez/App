@@ -35,6 +35,10 @@ public class DestinationAppService :
     public async Task<ListResultDto<CityDto>> SearchCitiesAsync(SearchDestinationsInputDto input)
     {
 
+        Console.BackgroundColor = ConsoleColor.Blue;
+        Console.WriteLine($" >>> [APP SERVICE] Recibida petición para: {input.PartialName}, Country: {input.Country}");
+        Console.ResetColor();
+
         return await _citySearchService.SearchCitiesAsync(input);
     }
 

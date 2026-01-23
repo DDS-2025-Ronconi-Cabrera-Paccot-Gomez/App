@@ -12,5 +12,8 @@ namespace TravelPro.Destinations.Dtos
         public int? MinPopulation { get; set; }
         public string? Country { get; set; } = string.Empty;
         public string? Region { get; set; }
+
+        public string CountryName { get; set; }
+        public string RegionName { get; set; }  
     }
 }

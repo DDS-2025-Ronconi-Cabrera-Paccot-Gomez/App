@@ -24,4 +24,6 @@ export interface SearchDestinationsInputDto {
   minPopulation?: number;
   country?: string;
   region?: string;
+  countryName?: string;
+  regionName?: string;
 }
