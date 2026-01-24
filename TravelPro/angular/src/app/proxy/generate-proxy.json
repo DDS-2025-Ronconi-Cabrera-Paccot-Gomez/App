@@ -1102,6 +1102,14 @@
                   }
                 },
                 {
+                  "name": "GetTopDestinationsAsync",
+                  "parametersOnMethod": [],
+                  "returnValue": {
+                    "type": "System.Collections.Generic.List<TravelPro.Destinations.DestinationDto>",
+                    "typeSimple": "[TravelPro.Destinations.DestinationDto]"
+                  }
+                },
+                {
                   "name": "GetAsync",
                   "parametersOnMethod": [
                     {
@@ -1388,6 +1396,21 @@
               "returnValue": {
                 "type": "System.Collections.Generic.List<TravelPro.Destinations.Dtos.RegionDto>",
                 "typeSimple": "[TravelPro.Destinations.Dtos.RegionDto]"
+              },
+              "allowAnonymous": null,
+              "implementFrom": "TravelPro.Destinations.IDestinationAppService"
+            },
+            "GetTopDestinationsAsync": {
+              "uniqueName": "GetTopDestinationsAsync",
+              "name": "GetTopDestinationsAsync",
+              "httpMethod": "GET",
+              "url": "api/app/destination/top-destinations",
+              "supportedVersions": [],
+              "parametersOnMethod": [],
+              "parameters": [],
+              "returnValue": {
+                "type": "System.Collections.Generic.List<TravelPro.Destinations.DestinationDto>",
+                "typeSimple": "[TravelPro.Destinations.DestinationDto]"
               },
               "allowAnonymous": null,
               "implementFrom": "TravelPro.Destinations.IDestinationAppService"

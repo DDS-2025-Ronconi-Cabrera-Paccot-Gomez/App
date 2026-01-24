@@ -62,6 +62,14 @@ export class DestinationService {
     { apiName: this.apiName,...config });
   
 
+  getTopDestinations = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, DestinationDto[]>({
+      method: 'GET',
+      url: '/api/app/destination/top-destinations',
+    },
+    { apiName: this.apiName,...config });
+  
+
   searchCities = (input: SearchDestinationsInputDto, config?: Partial<Rest.Config>) =>
     this.restService.request<any, ListResultDto<CityDto>>({
       method: 'POST',

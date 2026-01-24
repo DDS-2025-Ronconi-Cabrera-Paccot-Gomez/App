@@ -401,13 +401,12 @@ namespace TravelPro.GeoServices
                 var response = await client.GetAsync(url);
 
                 // LOG DE EMERGENCIA:
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"[EXTERNAL API] Status: {response.StatusCode} para la URL: {url}");
+
                 if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     Console.WriteLine(" ¡TE ESTÁN BLOQUEANDO POR VELOCIDAD (Error 429)!");
                 }
-                Console.ResetColor();
+                
 
                 if (!response.IsSuccessStatusCode) {
                     return new List<RegionDto>(); 
@@ -415,7 +414,7 @@ namespace TravelPro.GeoServices
 
                 var json = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine($"[EXTERNAL API] Body: {json}");
+           
 
                 var regions = new List<RegionDto>();
 

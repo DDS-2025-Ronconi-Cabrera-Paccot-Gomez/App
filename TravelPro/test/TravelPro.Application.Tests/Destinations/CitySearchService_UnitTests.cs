@@ -124,5 +124,61 @@ namespace TravelPro.Destinations
 
             exception.Message.ShouldBe("Simulated API failure!");
         }
+
+        [Fact]
+        public async Task SearchCitiesAsync_ShouldPassAllFiltersToApiService()
+        {
+            // 1. ARRANGE (Preparar)
+            // Simulamos que el usuario busca ciudades en "Argentina" (AR), 
+            // Región "Córdoba", con más de 50,000 habitantes.
+            var input = new SearchDestinationsInputDto
+            {
+                PartialName = "Villa", // Busca ciudades que empiecen con Villa
+                Country = "AR",
+                Region = "Córdoba",
+                MinPopulation = 50000
+            };
+
+            var fakeApiResult = new List<CitySearchResultDto>
+            {
+                new CitySearchResultDto
+                {
+                    Name = "Villa Carlos Paz",
+                    Country = "Argentina",
+                    Population = 62000,
+                    Region = "Córdoba",
+                    Coordinates = new Coordinate("-31.4", "-64.5")
+                }
+            };
+
+            // CONFIGURAMOS EL MOCK DE LA API:
+            // Usamos Arg.Is(...) para verificar que el servicio recibe EXACTAMENTE los filtros que pusimos.
+            // Si el servicio interno modificara o borrara algún filtro, esta prueba fallaría.
+            _citySearchServiceMock
+                .SearchCitiesAsync(Arg.Is<SearchDestinationsInputDto>(x =>
+                    x.PartialName == "Villa" &&
+                    x.Country == "AR" &&
+                    x.Region == "Córdoba" &&
+                    x.MinPopulation == 50000
+                ))
+                .Returns(Task.FromResult(fakeApiResult));
+
+            // Configuramos el repo para que devuelva lista vacía (sin coincidencias locales por ahora)
+            _destinationRepositoryMock
+                .GetListAsync(Arg.Any<Expression<Func<Destination, bool>>>())
+                .Returns(Task.FromResult(new List<Destination>()));
+
+            // 2. ACT (Actuar)
+            var result = await _cityAppService.SearchCitiesAsync(input);
+
+            // 3. ASSERT (Verificar)
+            result.ShouldNotBeNull();
+            result.Items.Count.ShouldBe(1);
+            result.Items[0].Name.ShouldBe("Villa Carlos Paz");
+
+            // Verificación doble: Aseguramos que el método del mock fue llamado 1 vez con esos argumentos
+            await _citySearchServiceMock.Received(1).SearchCitiesAsync(Arg.Is<SearchDestinationsInputDto>(x =>
+                x.Country == "AR" && x.MinPopulation == 50000));
+        }
     }
 }

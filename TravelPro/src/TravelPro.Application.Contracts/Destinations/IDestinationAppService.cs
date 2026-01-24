@@ -21,4 +21,5 @@ public interface IDestinationAppService :
     Task<List<CountryDto>> GetCountriesAsync();
     Task<List<RegionDto>> GetRegionsAsync(string countryCode);
 
+    Task<List<DestinationDto>> GetTopDestinationsAsync();
 }
