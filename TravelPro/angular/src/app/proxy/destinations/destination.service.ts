@@ -1,4 +1,4 @@
-import type { CityDto, SearchDestinationsInputDto } from './dtos/models';
+import type { CityDto, CountryDto, RegionDto, SearchDestinationsInputDto } from './dtos/models';
 import type { CreateUpdateDestinationDto, DestinationDto } from './models';
 import { RestService, Rest } from '@abp/ng.core';
 import type { ListResultDto, PagedAndSortedResultRequestDto, PagedResultDto } from '@abp/ng.core';
@@ -36,11 +36,36 @@ export class DestinationService {
     { apiName: this.apiName,...config });
   
 
+  getCountries = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, CountryDto[]>({
+      method: 'GET',
+      url: '/api/app/destination/countries',
+    },
+    { apiName: this.apiName,...config });
+  
+
   getList = (input: PagedAndSortedResultRequestDto, config?: Partial<Rest.Config>) =>
     this.restService.request<any, PagedResultDto<DestinationDto>>({
       method: 'GET',
       url: '/api/app/destination',
       params: { sorting: input.sorting, skipCount: input.skipCount, maxResultCount: input.maxResultCount },
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getRegions = (countryCode: string, config?: Partial<Rest.Config>) =>
+    this.restService.request<any, RegionDto[]>({
+      method: 'GET',
+      url: '/api/app/destination/regions',
+      params: { countryCode },
+    },
+    { apiName: this.apiName,...config });
+  
+
+  getTopDestinations = (config?: Partial<Rest.Config>) =>
+    this.restService.request<any, DestinationDto[]>({
+      method: 'GET',
+      url: '/api/app/destination/top-destinations',
     },
     { apiName: this.apiName,...config });
   

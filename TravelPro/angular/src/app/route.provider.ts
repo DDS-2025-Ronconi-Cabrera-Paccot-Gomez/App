@@ -33,7 +33,14 @@ function configureRoutes() {
         iconClass: 'fa fa-search', // Ícono de lupa
         order: 3, // El orden: 1 es Home, 2 es Destinos (aprox), 3 irá abajo
         layout: eLayoutType.application,
-      }
+      },
+      {
+        path: '/popular-destinations',
+        name: 'Destinos populares',
+        iconClass: 'fas fa-star', // Ícono de estrella
+        order: 2, // El orden: 1 es Home, 2 pondrá esto arriba de "Buscar Usuarios" (ajusta según prefieras)
+        layout: eLayoutType.application,
+      },
   ]);
 
 

@@ -23,6 +23,7 @@ namespace TravelPro.EntityFrameworkCore.Tests.Ratings
         private readonly IRepository<Destination, Guid> _destinationRepository;
         private readonly IRepository<IdentityUser, Guid> _userRepository;
         private readonly ICurrentUser _currentUser;
+        private readonly IDestinationAppService _destinationAppService;
 
         public RatingAppService_IntegrationTests()
         {
@@ -31,6 +32,7 @@ namespace TravelPro.EntityFrameworkCore.Tests.Ratings
             _destinationRepository = GetRequiredService<IRepository<Destination, Guid>>();
             _userRepository = GetRequiredService<IRepository<IdentityUser, Guid>>();
             _currentUser = GetRequiredService<ICurrentUser>();
+            _destinationAppService = GetRequiredService<IDestinationAppService>();
         }
 
         [Fact]
@@ -395,6 +397,54 @@ namespace TravelPro.EntityFrameworkCore.Tests.Ratings
 
             // ¡Esta es la clave del 5.5! Verificar que trajo el nombre y no solo el ID
             review.UserName.ShouldBe("juan_viajero");
+        }
+
+        //Punto 3.4 - Destinos populares
+        [Fact]
+        public async Task Should_Return_Top_Destinations_Ordered_By_Score()
+        {
+            // 1. ARRANGE
+
+            // Creamos 3 destinos
+            var paris = await CreateDestinationAsync(); // Será el MEJOR (5 estrellas)
+            var londres = await CreateDestinationAsync(); // Será el PEOR (3 estrellas)
+            var madrid = await CreateDestinationAsync(); // Será el INTERMEDIO (4 estrellas)
+
+            // Asignamos nombres para verificar fácil
+            paris.Name = "Paris";
+            londres.Name = "Londres";
+            madrid.Name = "Madrid";
+            await WithUnitOfWorkAsync(async () => await _destinationRepository.UpdateAsync(paris));
+            await WithUnitOfWorkAsync(async () => await _destinationRepository.UpdateAsync(londres));
+            await WithUnitOfWorkAsync(async () => await _destinationRepository.UpdateAsync(madrid));
+
+            // Creamos un usuario votante
+            var user = await CreateUserAsync("voter", "voter@abp.io");
+            Login(user.Id);
+
+            // Votamos
+            await _ratingAppService.CreateAsync(new CreateUpdateRatingDto { DestinationId = paris.Id, Score = 5 });
+            await _ratingAppService.CreateAsync(new CreateUpdateRatingDto { DestinationId = londres.Id, Score = 3 });
+            await _ratingAppService.CreateAsync(new CreateUpdateRatingDto { DestinationId = madrid.Id, Score = 4 });
+
+            // 2. ACT
+            // Llamamos al método que devuelve el ranking
+            // Usamos WithUnitOfWorkAsync para asegurar que lea los cambios recientes
+            var topList = await _destinationAppService.GetTopDestinationsAsync();
+
+            // 3. ASSERT
+            topList.ShouldNotBeEmpty();
+            topList.Count.ShouldBeGreaterThanOrEqualTo(3);
+
+            // Verificamos el ORDEN (Descendente por puntaje)
+            // #1 Debería ser Paris (5.0)
+            topList[0].Name.ShouldBe("Paris");
+
+            // #2 Debería ser Madrid (4.0)
+            topList[1].Name.ShouldBe("Madrid");
+
+            // #3 Debería ser Londres (3.0)
+            topList[2].Name.ShouldBe("Londres");
         }
     }
 
