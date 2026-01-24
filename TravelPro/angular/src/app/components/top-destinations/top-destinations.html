@@ -1,0 +1,56 @@
+<div class="top-section py-5 bg-light">
+  <div class="container">
+    
+    <div class="text-center mb-5">
+      <h2 class="fw-bold text-primary">
+        <i class="fa fa-trophy text-warning me-2"></i> Ranking de Destinos
+      </h2>
+      <p class="text-muted">Descubre los lugares favoritos de nuestra comunidad, ordenados por calificación.</p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && topDestinations.length === 0" class="text-center text-muted">
+      <p>Aún no hay suficientes calificaciones para generar el ranking. ¡Sé el primero en opinar!</p>
+    </div>
+
+    <!-- Grid de Resultados -->
+    <!-- Cambiamos 'justify-content-center' por un grid estándar para que si hay 4, el 4to vaya abajo a la izquierda -->
+    <div class="row g-4"> 
+      <div class="col-md-4" *ngFor="let dest of topDestinations; let i = index">
+        
+        <div class="card h-100 border-0 shadow-sm hover-card">
+          
+          <!-- Badge de Ranking: Color diferente para el Top 3 -->
+          <div class="ranking-badge" 
+               [ngClass]="{'bg-gold': i === 0, 'bg-silver': i === 1, 'bg-bronze': i === 2, 'bg-standard': i > 2}">
+            {{ i + 1 }}
+          </div>
+          
+          <div class="card-body text-center pt-5">
+            <h4 class="card-title fw-bold text-dark">{{ dest.name }}</h4>
+            <h6 class="text-muted mb-3">{{ dest.country }}</h6>
+            
+            <div class="rating-display mb-3">
+              <!-- Usamos un pipe number para asegurar 1 decimal -->
+              <span class="display-6 fw-bold text-warning">{{ (dest.averageScore || 0) | number:'1.1-1' }}</span>
+              <div class="small text-muted">
+                 <i class="fa fa-star text-warning"></i> Promedio
+                 <span *ngIf="dest.totalCount">({{ dest.totalCount }} votos)</span>
+              </div>
+            </div>
+
+            <!-- Botón Ver (Opcional, podrías redirigir al buscador filtrando por nombre) -->
+            <!-- <button class="btn btn-outline-primary rounded-pill px-4">Ver Detalles</button> -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

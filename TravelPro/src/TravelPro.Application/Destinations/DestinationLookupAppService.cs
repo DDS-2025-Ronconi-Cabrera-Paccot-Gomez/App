@@ -32,7 +32,7 @@ namespace TravelPro.Destinations
             }
 
             // A) Traer ciudades de la API Externa
-            var apiCities = await _citySearchService.SearchCitiesByNameAsync(input.PartialName);
+            var apiCities = await _citySearchService.SearchCitiesAsync(input);
 
             // B) Mapeo inicial a DTOs (inicialmente con ID vacío)
             var resultDtos = apiCities.Select(c => new CityDto
@@ -42,7 +42,7 @@ namespace TravelPro.Destinations
                 Country = c.Country,
                 Coordinates = c.Coordinates,
                 Population = c.Population,
-                //Region = c.Region // Asegúrate de mapear esto si tu DTO lo tiene
+                Region = c.Region
             }).ToList();
 
             // C) LÓGICA DE CRUCE: Buscar coincidencias en la BD Local
@@ -71,6 +71,17 @@ namespace TravelPro.Destinations
             }
 
             return new ListResultDto<CityDto>(resultDtos);
+        }
+        public async Task<List<CountryDto>> GetCountriesAsync()
+        {
+            // Delegamos la llamada al servicio de infraestructura (API Externa)
+            return await _citySearchService.GetCountriesAsync();
+        }
+
+        public async Task<List<RegionDto>> GetRegionsAsync(string countryCode)
+        {
+            // Delegamos la llamada al servicio de infraestructura (API Externa)
+            return await _citySearchService.GetRegionsAsync(countryCode);
         }
     }
 }

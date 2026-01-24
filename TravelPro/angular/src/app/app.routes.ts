@@ -4,6 +4,7 @@ import { Destinations } from './destinations/destinations';
 import { replaceAccountManageRoute } from './account/manage/replace.manage.routing';
 import { PublicProfileComponent } from './users/public-profile/public-profile';
 import { UserSearchComponent } from './users/user-search/user-search';
+import { TopDestinationsComponent } from './components/top-destinations/top-destinations'; 
 
 export const APP_ROUTES: Routes = [
   replaceAccountManageRoute,
@@ -43,5 +44,10 @@ export const APP_ROUTES: Routes = [
   component: UserSearchComponent,
   canActivate: [authGuard]
 },
+{
+    path: 'popular-destinations',
+    component: TopDestinationsComponent,
+    // canActivate: [AuthGuard] // Descomenta si quieres que solo lo vean usuarios logueados
+  },
 
 ];
