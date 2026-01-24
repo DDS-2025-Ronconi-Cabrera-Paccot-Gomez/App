@@ -1,4 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata; //  NECESARIO para IMutableEntityType
+using System; //  NECESARIO para Func<T> y Guid
+using System.Linq.Expressions; //  NECESARIO para Expression
+using TravelPro.Destinations;
+using TravelPro.Ratings;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
@@ -9,15 +14,11 @@ using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
+using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp.OpenIddict.EntityFrameworkCore;
-using TravelPro.Destinations;
-using TravelPro.Ratings;
 using Volo.Abp.Users; //  NECESARIO para ICurrentUser
-using System.Linq.Expressions; //  NECESARIO para Expression
-using System; //  NECESARIO para Func<T> y Guid
-using Microsoft.EntityFrameworkCore.Metadata; //  NECESARIO para IMutableEntityType
+using TravelPro.Experiences;
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -30,7 +31,7 @@ public class TravelProDbContext :
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     public DbSet<Destination> Destinations { get; set; }
     public DbSet<Rating> Ratings { get; set; }
-
+    public DbSet<Experience> Experiences { get; set; }
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityProDbContext 
@@ -139,6 +140,20 @@ public class TravelProDbContext :
         {
             b.Property<string>("ProfilePhoto")
                 .IsRequired(false);
+        });
+
+        //Mapeo experiencia
+        builder.Entity<Experience>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "Experiences", TravelProConsts.DbSchema);
+            b.ConfigureByConvention();
+
+            b.Property(x => x.Title).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Description).IsRequired().HasMaxLength(2000);
+            b.Property(x => x.Tags).HasMaxLength(256);
+
+            // Índice para buscar rápido por Tags (Punto 4.6)
+            b.HasIndex(x => x.Tags);
         });
 
     }

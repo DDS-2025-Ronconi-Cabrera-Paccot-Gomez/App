@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TravelPro.Ratings
+namespace TravelPro.Experiences
 {
-    public interface IUserOwned
+    public enum ExperienceSentiment
     {
-        Guid UserId { get; set; }
+        Neutral = 0,
+        Positive = 1,
+        Negative = 2
     }
 }
