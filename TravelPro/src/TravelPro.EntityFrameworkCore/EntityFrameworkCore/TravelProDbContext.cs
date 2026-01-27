@@ -19,6 +19,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.Users; //  NECESARIO para ICurrentUser
 using TravelPro.Experiences;
+using TravelPro.Watchlists;
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -32,6 +33,8 @@ public class TravelProDbContext :
     public DbSet<Destination> Destinations { get; set; }
     public DbSet<Rating> Ratings { get; set; }
     public DbSet<Experience> Experiences { get; set; }
+
+    public DbSet<Watchlist> Watchlists { get; set; }
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityProDbContext 
@@ -155,8 +158,18 @@ public class TravelProDbContext :
             // Índice para buscar rápido por Tags (Punto 4.6)
             b.HasIndex(x => x.Tags);
         });
+        //Mapeo lista de favoritos
+        builder.Entity<Watchlist>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "Watchlists", TravelProConsts.DbSchema);
+            b.ConfigureByConvention();
 
+            // Índice Único: Un usuario solo puede tener 1 entrada por destino
+            b.HasIndex(x => new { x.UserId, x.DestinationId }).IsUnique();
+        });
     }
+
+    
     // 3. AQUÍ VAN LOS NUEVOS MÉTODOS DEL FILTRO (DEL TUTORIAL) 
     //    Van al final de la clase, al mismo nivel que el constructor y OnModelCreating.
 
