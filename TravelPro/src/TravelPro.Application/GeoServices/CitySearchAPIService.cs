@@ -1,14 +1,19 @@
 ﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TravelPro.Converters;
 using TravelPro.Destinations.Dtos;
+using TravelPro.Metrics;
 using TravelPro.TravelProGeo;
 using Volo.Abp;
+using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Guids;
+using Volo.Abp.Uow;
 
 namespace TravelPro.GeoServices
 {
@@ -18,9 +23,30 @@ namespace TravelPro.GeoServices
         private readonly string baseUrl = "https://wft-geo-db.p.rapidapi.com/v1/geo";
         private readonly string apiHost = "wft-geo-db.p.rapidapi.com";
 
+        private readonly IRepository<ApiMetric, Guid> _metricRepository;
+        private readonly IGuidGenerator _guidGenerator;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
+
+        public CitySearchAPIService(
+            IRepository<ApiMetric, Guid> metricRepository,
+            IGuidGenerator guidGenerator,
+            IUnitOfWorkManager unitOfWorkManager)
+        {
+            _metricRepository = metricRepository;
+            _guidGenerator = guidGenerator;
+            _unitOfWorkManager = unitOfWorkManager;
+        }
+
+
         public async Task<List<CitySearchResultDto>> SearchCitiesAsync(SearchDestinationsInputDto input)
         {
-            using (HttpClient client = new HttpClient())
+            // 1. INICIO MÉTRICA
+            var stopwatch = Stopwatch.StartNew();
+            var statusCode = 500;
+            string finalUrl = $"{baseUrl}/cities"; // URL por defecto por si falla antes
+           try
+            {
+                using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Key", apiKey);
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Host", apiHost);
@@ -101,12 +127,13 @@ namespace TravelPro.GeoServices
                     url = $"{baseUrl}/cities{queryParams}";
                 }
 
+                    finalUrl = $"{baseUrl}/cities{queryParams}";
 
 
-
-                // --- 4. EJECUCIÓN ---
-                HttpResponseMessage response = await client.GetAsync(url);
-                if (!response.IsSuccessStatusCode) return new List<CitySearchResultDto>();
+                    // --- 4. EJECUCIÓN ---
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    statusCode = (int)response.StatusCode;
+                    if (!response.IsSuccessStatusCode) return new List<CitySearchResultDto>();
 
                 string json = await response.Content.ReadAsStringAsync();
 
@@ -134,6 +161,18 @@ namespace TravelPro.GeoServices
 
                
                 return cities;
+            }
+        }
+            catch (Exception)
+            {
+                statusCode = 500; // Error interno
+                throw;
+            }
+            finally
+            {
+                // 2. FIN MÉTRICA (Guardar en BD)
+                stopwatch.Stop();
+                await SaveMetricAsync("GeoDB", finalUrl, statusCode, stopwatch.ElapsedMilliseconds);
             }
         }
         public async Task<List<CountryDto>> GetCountriesAsync()
@@ -389,13 +428,20 @@ namespace TravelPro.GeoServices
         {
             if (string.IsNullOrWhiteSpace(countryCode)) return new List<RegionDto>();
 
-            using (HttpClient client = new HttpClient())
+            var stopwatch = Stopwatch.StartNew();
+            var statusCode = 500;
+            string url = $"{baseUrl}/countries/{countryCode}/regions?limit=10";
+
+            try
+            {
+
+                using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Key", apiKey);
                 client.DefaultRequestHeaders.Add("X-RapidAPI-Host", apiHost);
 
                 // Llamamos al endpoint de regiones de un país
-                string url = $"{baseUrl}/countries/{countryCode}/regions?limit=10";
+                url = $"{baseUrl}/countries/{countryCode}/regions?limit=10";
 
 
                 var response = await client.GetAsync(url);
@@ -433,11 +479,46 @@ namespace TravelPro.GeoServices
                 }
                 return regions.OrderBy(r => r.Name).ToList();
             }
+            }
+            catch (Exception)
+            {
+                statusCode = 500;
+                return new List<RegionDto>();
+            }
+            finally
+            {
+                stopwatch.Stop();
+                await SaveMetricAsync("GeoDB", url, statusCode, stopwatch.ElapsedMilliseconds);
+            }
         }
         // Clase auxiliar para mapear la respuesta de la API
         private class GeoDbResponse
         {
             public List<CitySearchResultDto> Data { get; set; }
+        }
+
+        private async Task SaveMetricAsync(string apiName, string url, int status, long duration)
+        {
+            try
+            {
+                // Usamos UnitOfWork independiente para guardar el log aunque la operación principal falle
+                using (var uow = _unitOfWorkManager.Begin(requiresNew: true))
+                {
+                    await _metricRepository.InsertAsync(new ApiMetric(
+                        _guidGenerator.Create(),
+                        apiName,
+                        url,
+                        status,
+                        duration
+                    ));
+                    await uow.CompleteAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Si falla el log, solo lo escribimos en consola para no romper la app
+                Console.WriteLine($"Error guardando métrica: {ex.Message}");
+            }
         }
     }
 }
