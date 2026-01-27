@@ -4,6 +4,7 @@ using System; //  NECESARIO para Func<T> y Guid
 using System.Linq.Expressions; //  NECESARIO para Expression
 using TravelPro.Destinations;
 using TravelPro.Experiences;
+using TravelPro.Metrics;
 using TravelPro.Notifications;
 using TravelPro.Ratings;
 using TravelPro.Watchlists;
@@ -39,6 +40,8 @@ public class TravelProDbContext :
     public DbSet<Watchlist> Watchlists { get; set; }
 
     public DbSet<Notification> Notifications { get; set; }
+
+    public DbSet<ApiMetric> ApiMetrics { get; set; }
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityProDbContext 
@@ -170,6 +173,14 @@ public class TravelProDbContext :
 
             // Índice Único: Un usuario solo puede tener 1 entrada por destino
             b.HasIndex(x => new { x.UserId, x.DestinationId }).IsUnique();
+        });
+
+        //Mapeo metricas
+        builder.Entity<ApiMetric>(b =>
+        {
+            b.ToTable(TravelProConsts.DbTablePrefix + "ApiMetrics", TravelProConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.HasIndex(x => x.ApiName); // Índice para búsquedas rápidas
         });
     }
 
