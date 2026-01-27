@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TravelPro.EntityFrameworkCore.Tests.Fakes;
+using TravelPro.Events;
 using Volo.Abp;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.BackgroundWorkers;
@@ -68,6 +69,7 @@ public class TravelProEntityFrameworkCoreTestModule : AbpModule
         {
             options.AddMaps<TravelProApplicationModule>(validate: true);
         });
+        context.Services.AddSingleton<IEventAPIService, FakeEventAPIService>();
     }
 
     private void ConfigureInMemorySqlite(IServiceCollection services)

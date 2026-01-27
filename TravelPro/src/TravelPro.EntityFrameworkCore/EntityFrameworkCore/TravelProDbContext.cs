@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore.Metadata; //  NECESARIO para IMutableEntityT
 using System; //  NECESARIO para Func<T> y Guid
 using System.Linq.Expressions; //  NECESARIO para Expression
 using TravelPro.Destinations;
+using TravelPro.Experiences;
+using TravelPro.Notifications;
 using TravelPro.Ratings;
+using TravelPro.Watchlists;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
@@ -18,8 +21,7 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.Users; //  NECESARIO para ICurrentUser
-using TravelPro.Experiences;
-using TravelPro.Watchlists;
+
 
 namespace TravelPro.EntityFrameworkCore;
 
@@ -35,6 +37,8 @@ public class TravelProDbContext :
     public DbSet<Experience> Experiences { get; set; }
 
     public DbSet<Watchlist> Watchlists { get; set; }
+
+    public DbSet<Notification> Notifications { get; set; }
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityProDbContext 
