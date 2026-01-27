@@ -4,7 +4,8 @@ using TravelPro.Destinations;
 using TravelPro.Experiences;
 using TravelPro.Experiences.Dtos;
 using TravelPro.Ratings;
-
+using TravelPro.Watchlists;
+using TravelPro.Watchlists.Dtos;
 namespace TravelPro;
 
 public class TravelProApplicationAutoMapperProfile : Profile
@@ -52,6 +53,10 @@ public class TravelProApplicationAutoMapperProfile : Profile
 
         CreateMap<Experience, ExperienceDto>()
                 .ForMember(dest => dest.UserName, opt => opt.Ignore());
+
+        CreateMap<Watchlist, WatchlistDto>()
+    .ForMember(dest => dest.DestinationName, opt => opt.Ignore())    // Se llenan manual
+    .ForMember(dest => dest.DestinationCountry, opt => opt.Ignore());
         // evita problemas con relaciones
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
