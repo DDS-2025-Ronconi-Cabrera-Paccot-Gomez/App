@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TravelPro.Events.Dtos;
+using TravelPro.Metrics;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Guids;
+using Volo.Abp.Uow;
 
 namespace TravelPro.Events
 {
@@ -13,55 +18,64 @@ namespace TravelPro.Events
         private readonly string apiKey = "pis6jNIILZnLRYvDksINQffc2FYx3G8C";
         private readonly string baseUrl = "https://app.ticketmaster.com/discovery/v2/events.json";
 
+        // Inyecciones
+        private readonly IRepository<ApiMetric, Guid> _metricRepository;
+        private readonly IGuidGenerator _guidGenerator;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
+
+        public EventAPIService(
+            IRepository<ApiMetric, Guid> metricRepository,
+            IGuidGenerator guidGenerator,
+            IUnitOfWorkManager unitOfWorkManager)
+        {
+            _metricRepository = metricRepository;
+            _guidGenerator = guidGenerator;
+            _unitOfWorkManager = unitOfWorkManager;
+        }
+
         public async Task<List<EventDetail>> GetEventsByCityAsync(string city)
         {
-            using (HttpClient client = new HttpClient())
+            var stopwatch = Stopwatch.StartNew();
+            var statusCode = 500;
+            string url = $"{baseUrl}?apikey={apiKey}&city={Uri.EscapeDataString(city)}&sort=date,asc&size=3";
+
+            try
             {
-                // Construimos la URL
-                string url = $"{baseUrl}?apikey={apiKey}&city={Uri.EscapeDataString(city)}&sort=date,asc&size=3";
-
-                // LOG 1: Ver qué URL estamos intentando llamar
-                Console.BackgroundColor = ConsoleColor.Yellow;
-                Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine($"[TICKETMASTER] Solicitando: {url}");
-                Console.ResetColor();
-
-                try
+                using (HttpClient client = new HttpClient())
                 {
                     HttpResponseMessage response = await client.GetAsync(url);
-
-                    // LOG 2: Ver el código de estado (200, 401, 404?)
-                    Console.WriteLine($"[TICKETMASTER] Respuesta: {response.StatusCode}");
+                    statusCode = (int)response.StatusCode;
 
                     if (response.IsSuccessStatusCode)
                     {
                         string json = await response.Content.ReadAsStringAsync();
-
-                        // LOG 3: Ver un pedacito del JSON para asegurar que llegó algo
-                        // (Imprimimos los primeros 200 caracteres para no ensuciar toda la consola)
-                        string jsonPreview = json.Length > 200 ? json.Substring(0, 200) + "..." : json;
-                        Console.WriteLine($"[TICKETMASTER] JSON Recibido: {jsonPreview}");
-
                         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                         var result = JsonSerializer.Deserialize<TicketmasterResponse>(json, options);
-
-                        var eventos = result?.Embedded?.Events ?? new List<EventDetail>();
-                        Console.WriteLine($"[TICKETMASTER] Eventos deserializados: {eventos.Count}");
-
-                        return eventos;
+                        return result?.Embedded?.Events ?? new List<EventDetail>();
                     }
-                    else
-                    {
-                        string errorBody = await response.Content.ReadAsStringAsync();
-                        Console.WriteLine($"[TICKETMASTER ERROR] {errorBody}");
-                    }
+                    return new List<EventDetail>();
                 }
-                catch (Exception ex)
+            }
+            catch
+            {
+                statusCode = 500;
+                return new List<EventDetail>(); // En Ticketmaster solemos devolver vacío si falla para no romper notificaciones
+            }
+            finally
+            {
+                stopwatch.Stop();
+                // Guardamos en una transacción separada
+                using (var uow = _unitOfWorkManager.Begin(requiresNew: true))
                 {
-                    Console.WriteLine($"[TICKETMASTER EXCEPTION] {ex.Message}");
+                    await _metricRepository.InsertAsync(new ApiMetric(
+                        _guidGenerator.Create(),
+                        "Ticketmaster",
+                        url,
+                        statusCode,
+                        stopwatch.ElapsedMilliseconds
+                    ));
+                    await uow.CompleteAsync();
                 }
-
-                return new List<EventDetail>();
             }
         }
     }
