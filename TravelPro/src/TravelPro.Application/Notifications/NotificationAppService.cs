@@ -63,6 +63,8 @@ namespace TravelPro.Notifications
                 var events = await _eventApiService.GetEventsByCityAsync(dest.Name);
                 totalEventsFound += events.Count;
 
+                var processedInThisBatch = new HashSet<string>();
+
                 foreach (var evt in events)
                 {
                     // VALIDACIÓN DE SEGURIDAD PARA DATOS NULOS O LARGOS
@@ -80,10 +82,20 @@ namespace TravelPro.Notifications
                     string safeUrl = evt.Url ?? "#";
 
                     // D) Verificar duplicados
+                    string uniqueKey = $"{safeTitle}|{dateStr}";
+                    if (processedInThisBatch.Contains(uniqueKey))
+                    {
+                        // Si ya lo vimos en este bucle, lo saltamos 
+                        continue;
+                    }
+                    // Lo marcamos como visto para la siguiente iteración del bucle
+                    processedInThisBatch.Add(uniqueKey);
+
                     // Usamos el título seguro para buscar
                     var exists = await _notificationRepository.AnyAsync(n =>
                         n.UserId == userId &&
-                        n.Title == safeTitle);
+                        n.Title == safeTitle &&
+                        n.Message == safeMessage);
 
                     if (!exists)
                     {

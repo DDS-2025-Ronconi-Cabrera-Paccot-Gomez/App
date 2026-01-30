@@ -73,8 +73,14 @@ export class Destinations implements OnInit {
     this.searchTrigger$.pipe(
     debounceTime(1200),
     switchMap(() => {
-      if (!this.searchParams.country) {
-        return of({ items: [] });
+      
+    const hasCountry = !!this.searchParams.country;
+    const hasName = this.searchParams.partialName && this.searchParams.partialName.length >= 3;
+
+    if (!hasCountry && !hasName) {
+      console.warn("⚠️ Abortando: Se requiere al menos un país o un nombre de 3 letras.");
+      this.loading = false;
+      return of({ items: [] });
     }
       this.loading = true;
       // Sincronizamos nombres antes de la petición
@@ -86,6 +92,7 @@ export class Destinations implements OnInit {
       // Si está vacío, enviamos null. Esto suele ser la clave.
       region: this.searchParams.region || null, 
       minPopulation: this.searchParams.minPopulation || null,
+      country: this.searchParams.country || null,
       countryName: countryObj ? countryObj.name : '',
       regionName: regionObj ? regionObj.name : ''
       
@@ -157,68 +164,8 @@ onCountryChange(): void {
 
 
 
-  /*private loadCities(): void {
-    const hasName = this.searchParams.partialName && this.searchParams.partialName.length >= 3;
-    const hasCountry = this.searchParams.country && this.searchParams.country.length >= 2;
-    const hasPop = this.searchParams.minPopulation && this.searchParams.minPopulation > 0;
-    
-    if (!hasName && !hasCountry && !hasPop) {
-      this.destinations = [];
-      return;
-    }
-
-    this.loading = true;
-    this.destinations = [];
-    this.cityStats = {}; 
-
-    this.destinationService
-      .searchCities(this.searchParams)
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: (result: ListResultDto<CityDto>) => {
-          this.destinations = result.items || [];
-          this.loadExtrasForCities();
-        },
-        error: (error) => {
-          console.error('Error al cargar ciudades:', error);
-          this.destinations = [];
-        },
-      });
-  }*/
-
 
 onSearch(): void {
- /* const selectedCountryObj = this.countries.find(c => c.code === this.searchParams.country);
-  const selectedRegionObj = this.regions.find(r => r.code === this.searchParams.region);
-
-  this.searchParams.countryName = selectedCountryObj ? selectedCountryObj.name : '';
-  this.searchParams.regionName = selectedRegionObj ? selectedRegionObj.name : '';
-
-  const cleanParams = JSON.parse(JSON.stringify(this.searchParams));
-  if (!cleanParams.region) delete cleanParams.region; 
-  if (!cleanParams.minPopulation) delete cleanParams.minPopulation;
-
-  this.loading = true;
-  this.destinations = [];
-
-console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
-
-  this.destinationService.searchCities(this.searchParams)
-    .pipe(finalize(() => this.loading = false))
-    .subscribe({
-      next: (res) => {
-        console.log("📥 Resultados obtenidos:", res.items?.length || 0);
-        this.destinations = res.items || [];
-        //Cargamos las estrellas y reseñas también en búsquedas automáticas
-        if (this.destinations.length > 0) {
-          this.loadExtrasForCities();
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.destinations = [];
-      }
-    });*/
     this.searchTrigger$.next()
 }
 
@@ -269,12 +216,43 @@ console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
   saveRating(modal: any): void {
     if (!this.selectedCity || !this.currentUserId) return;
 
-    const cityId = (this.selectedCity as any).id || (this.selectedCity as any).Id;
+  const targetIndex = this.destinations.findIndex(d => {
+    // 1. Prioridad absoluta: ¿Es exactamente el mismo objeto en memoria?
+    // Esto funciona el 99% de las veces en Angular cuando vienes de un *ngFor
+    if (d === this.selectedCity) return true;
 
-    if (!cityId) {
-      alert('Error: No se pudo identificar el ID de la ciudad.');
-      return;
+    // 2. Si no es la misma referencia (ej: copias), miramos los IDs
+    const dId = (d as any).id || (d as any).Id;
+    const sId = (this.selectedCity as any).id || (this.selectedCity as any).Id;
+
+    // Helper para detectar IDs "basura" o vacíos
+    const isValidId = (id: any) => {
+        if (!id) return false;
+        if (id === '00000000-0000-0000-0000-000000000000') return false; // Empty GUID
+        return true;
+    };
+
+    // Solo comparamos por ID si AMBOS tienen un ID válido (guardado en DB)
+    if (isValidId(dId) && isValidId(sId)) {
+        return dId == sId;
     }
+
+    // Si llegamos aquí, los objetos son distintos y no tienen ID válido.
+    // No son el mismo.
+    return false;
+});
+
+  console.log(`🎯 Índice capturado para actualizar: ${targetIndex}`, this.destinations[targetIndex]);
+
+
+  if (targetIndex === -1) {
+      alert("Error crítico: No encuentro el destino en la lista local.");
+      return;
+  }
+    // El ID que usamos para buscar en GeoDB
+    const originalId = (this.selectedCity as any).id || (this.selectedCity as any).Id;
+
+  
 
     const destinationData: any = {
       name: this.selectedCity.name || 'Ciudad sin nombre',
@@ -291,9 +269,19 @@ console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
 
     this.loading = true;
 
-    this.destinationService.sync(cityId, destinationData)
+    this.destinationService.sync(originalId, destinationData)
       .subscribe({
         next: (syncedCity) => { 
+
+        if (this.destinations[targetIndex]) {
+            console.log("🔄 Reemplazando destino en posición:", targetIndex);
+          // Reemplazamos el objeto viejo por el sincronizado (que ya tiene el ID de DB)
+          this.destinations[targetIndex] = { ...syncedCity };
+          // Actualizamos también la ciudad seleccionada para que el resto del proceso use el ID nuevo
+          this.selectedCity = this.destinations[targetIndex];
+
+          this.destinations = [...this.destinations];
+        }
           this.currentRatingForm.destinationId = syncedCity.id; 
           this.executeSaveRatingLogic(modal);
         },
@@ -332,9 +320,12 @@ console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
 
   private finishRatingAction(modal: any): void {
     modal.close();
-    const selectedCityId = (this.selectedCity as any).id; 
+
     if (this.selectedCity) {
-      this.refreshCityData(selectedCityId);
+      const dbId = (this.selectedCity as any).id;
+      this.refreshCityData(dbId);
+
+      this.destinations = [...this.destinations];
     }
   }
 
@@ -362,9 +353,9 @@ console.log("🔍 SNAPSHOT AUTOMÁTICO:", JSON.stringify(this.searchParams));
       this.ratingService.getStatsByDestination(cityId).subscribe(s => this.cityStats[cityId] = s);
       if (this.currentUserId) {
         this.ratingService.getListByDestination(cityId).subscribe(list => {
-           const myReview = list.find(r => r.creatorId === this.currentUserId);
-           if (myReview) this.myReviews[cityId] = myReview;
-           else delete this.myReviews[cityId];
+          const myReview = list.find(r => r.creatorId === this.currentUserId);
+          if (myReview) this.myReviews[cityId] = myReview;
+          else delete this.myReviews[cityId];
         });
       }
   }
