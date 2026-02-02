@@ -146,7 +146,7 @@
 
                 <button type="button" class="btn btn-sm btn-info text-white" (click)="openReviewsModal(reviewsListModal, city)">
                    <i class="fa fa-comments me-1"></i> Ver Reseñas 
-                   <span *ngIf="cityStats[city.id]" class="badge bg-light text-dark ms-1">
+                   <span *ngIf="cityStats[city.id]" class="badge bg-white text-black shadow-sm ms-1 fw-bold">
                       {{ cityStats[city.id].totalCount }}
                    </span>
                 </button>

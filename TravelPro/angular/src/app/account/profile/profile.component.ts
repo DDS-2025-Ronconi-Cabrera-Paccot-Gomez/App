@@ -5,7 +5,8 @@ import { ProfileService } from '../../proxy/users/profile.service';
 import { ProfileDto, UpdateProfileDto } from '../../proxy/volo/abp/account/models';
 import { UserAvatarService } from 'src/app/services/user-avatar.service';
 import { ConfirmationService, Confirmation, ToasterService } from '@abp/ng.theme.shared';
-import { AuthService } from '@abp/ng.core';
+import { AuthService, RestService } from '@abp/ng.core';
+
 
 @Component({
     standalone: true,
@@ -19,6 +20,7 @@ export class ProfileComponent implements OnInit {
     profile: ProfileDto | null = null;
     editing = false;
     loading = false;
+    readonly defaultAvatar = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541';
     password = {
     currentPassword: '',
     newPassword: '',
@@ -32,7 +34,7 @@ export class ProfileComponent implements OnInit {
 
     constructor(private profileService: ProfileService, private avatar: UserAvatarService,private confirmation: ConfirmationService,
     private toaster: ToasterService,
-    private authService: AuthService) {}
+    private authService: AuthService,  private restService: RestService ) {}
 
     ngOnInit() {
         this.load();
@@ -51,6 +53,23 @@ export class ProfileComponent implements OnInit {
         complete: () => this.loading = false
         });
     }
+
+    get profilePic(): string {
+    // Si hay foto en el perfil, la usa. Si no, usa el default.
+    return (this.profile?.extraProperties?.['ProfilePhoto'] as string) || this.defaultAvatar;
+  }
+
+  // Manejo de error de imagen (si la URL base64 está rota)
+  onImageError(event: any) {
+    event.target.src = this.defaultAvatar;
+  }
+  toggleEdit() {
+    this.editing = !this.editing;
+    if (!this.editing) {
+       this.load(); // Si cancela, recargamos los datos originales
+    }
+  }
+  
 //VALIDACIONES
     validatePassword() {
     const errors: string[] = [];
@@ -153,33 +172,39 @@ validateSurname() {
         });
     }
 
-        changePassword() {
+  changePassword() {
+    console.log('Intentando cambiar contraseña...', this.password);
+
     this.validatePassword();
+    
     if (this.passwordErrors.length > 0) {
-        return;
+      this.passwordErrors.forEach(e => this.toaster.error(e));
+      return;
     }
 
-    if (this.password.newPassword !== this.password.confirmPassword) {
-        alert("Las contraseñas no coinciden");
-        return;
-    }
-
-    this.profileService.changePassword({
+    // Usamos RestService para llamar directamente al endpoint, evitando problemas de proxy
+    this.restService.request<any, void>({
+      method: 'POST',
+      url: '/api/profile/change-password', // Ruta definida en tu ProfileAppService
+      body: {
         currentPassword: this.password.currentPassword,
         newPassword: this.password.newPassword
+      }
     }).subscribe({
-        next: () => {
-        alert("Contraseña actualizada correctamente");
-
-        // limpiar campos
+      next: () => {
+        this.toaster.success("Contraseña actualizada correctamente");
+        // Limpiamos el formulario
         this.password = { currentPassword: '', newPassword: '', confirmPassword: '' };
-        },
-        error: (err) => {
+        this.passwordErrors = [];
+      },
+      error: (err) => {
         console.error("Error cambiando contraseña", err);
-        alert("Error cambiando la contraseña");
-        }
+        // Mostramos el mensaje exacto si el backend lo envía (ej: "Contraseña incorrecta")
+        const msg = err.error?.error?.message || "Error al cambiar la contraseña. Verifica la actual.";
+        this.toaster.error(msg);
+      }
     });
-}
+  }
 
 onFileSelected(event: any) {
     const file = event.target.files?.[0];
