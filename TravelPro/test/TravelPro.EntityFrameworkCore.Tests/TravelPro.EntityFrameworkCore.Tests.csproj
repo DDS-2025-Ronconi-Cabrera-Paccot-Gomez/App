@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>TravelPro</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TravelPro.EntityFrameworkCore\TravelPro.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\TravelPro.Application.Tests\TravelPro.Application.Tests.csproj" />
+    <ProjectReference Include="..\TravelPro.TestBase\TravelPro.TestBase.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="9.3.2" />
+		
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+		<PackageReference Include="Volo.Abp.OpenIddict.Domain" Version="9.3.2" />
+  </ItemGroup>
+
+</Project>

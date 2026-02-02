@@ -1,0 +1,74 @@
+<div class="container home-container">
+  
+  <!-- HERO SECTION: Bienvenida -->
+  <div class="text-center p-5 mb-5 bg-light rounded-3 hero-section shadow-sm">
+    <div class="container-fluid py-3">
+      <h1 class="display-4 fw-bold text-primary mb-3">TravelPro 🌍</h1>
+      <p class="col-md-8 fs-5 mx-auto text-secondary">
+        La plataforma definitiva para descubrir el mundo, conectar con viajeros y encontrar tu próxima aventura.
+      </p>
+      
+      <!-- Si NO está logueado, botón de entrar -->
+      @if(!hasLoggedIn){
+        <button (click)="login()" class="btn btn-primary btn-lg px-5 mt-3 shadow">
+          <i class="fa fa-sign-in me-2"></i> Comenzar Aventura
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- PANELES DE ACCESO RÁPIDO (Solo si está logueado) -->
+  @if(hasLoggedIn){
+    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+      
+      <!-- PANEL 1: BUSCAR DESTINOS -->
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm hover-card cursor-pointer" (click)="navigateToDestinations()">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-primary bg-gradient text-white mb-4 shadow">
+              <i class="fa fa-map-marked-alt fs-2"></i>
+            </div>
+            <h4 class="card-title fw-bold">Buscar Destinos</h4>
+            <p class="card-text text-muted mb-4">
+              Encuentra ciudades filtrando por país, región o población. Accede a mapas y detalles.
+            </p>
+            <button class="btn btn-outline-primary rounded-pill px-4">Ir al Buscador</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 2: DESTINOS POPULARES -->
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm hover-card cursor-pointer" (click)="navigateToPopular()">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-warning bg-gradient text-white mb-4 shadow">
+              <i class="fa fa-star fs-2"></i>
+            </div>
+            <h4 class="card-title fw-bold">Destinos Populares</h4>
+            <p class="card-text text-muted mb-4">
+              Descubre el ranking de los lugares mejor calificados por nuestra comunidad de viajeros.
+            </p>
+            <button class="btn btn-outline-warning text-dark rounded-pill px-4">Ver Ranking</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL 3: BUSCAR USUARIOS -->
+      <div class="col">
+        <div class="card h-100 border-0 shadow-sm hover-card cursor-pointer" (click)="navigateToUsers()">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-info bg-gradient text-white mb-4 shadow">
+              <i class="fa fa-users fs-2"></i>
+            </div>
+            <h4 class="card-title fw-bold">Buscar Viajeros</h4>
+            <p class="card-text text-muted mb-4">
+              Conecta con otros usuarios, explora sus perfiles públicos y comparte experiencias.
+            </p>
+            <button class="btn btn-outline-info rounded-pill px-4">Buscar Usuarios</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

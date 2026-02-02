@@ -1,0 +1,245 @@
+<div class="container-fluid">
+  
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title m-0">
+        <i class="fas fa-map-marked-alt me-2"></i>
+        Buscador de Ciudades
+      </h1>
+    </div>
+
+    <div class="card-body">
+      
+      <div class="search-container">
+        <div class="search-field">
+          <label for="search-query">Nombre de Ciudad</label>
+          <input
+            id="search-query"
+            type="text"
+            class="form-control"
+            [(ngModel)]="searchParams.partialName" 
+            (keyup.enter)="onSearch()"
+            placeholder="Buscar por nombre (ej: Buenos Aires)"
+          />
+        </div>
+
+        <div class="search-field">
+           <label>País</label>
+           <select 
+             class="form-select" 
+             [(ngModel)]="searchParams.country" 
+             (change)="onCountryChange()">
+             
+             <!-- Opción por defecto -->
+             <option value="">Todos los países</option>
+             
+             <!-- Lista cargada desde el backend -->
+             <option *ngFor="let c of countries" [value]="c.code">
+                {{ c.name }}
+             </option>
+             
+           </select>
+        </div>
+
+        <div class="search-field" style="max-width: 200px;">
+           <label>Región / Provincia</label>
+          <select 
+             class="form-select" 
+             [(ngModel)]="searchParams.region"
+             [disabled]="!searchParams.country || regions.length === 0"
+             (change)="onSearch()">
+             
+             <option value="" selected>Todas</option>
+             
+             <!-- Iteramos sobre la lista 'regions' que se carga al elegir país -->
+             <option *ngFor="let r of regions" [ngValue]="r.code">
+                {{ r.name }}
+             </option>
+           </select>
+        </div>
+
+        <div class="search-field" style="max-width: 220px;">
+           <label>Pob. Mínima</label>
+           <select class="form-select" [(ngModel)]="searchParams.minPopulation" (change)="onSearch()">
+              <option [ngValue]="null">Cualquiera</option>
+              <option [ngValue]="10000">10,000 (Pueblo)</option>
+              <option [ngValue]="50000">50,000 (Ciudad Pequeña)</option>
+              <option [ngValue]="100000">100,000 (Ciudad)</option>
+              <option [ngValue]="500000">500,000 (Gran Ciudad)</option>
+              <option [ngValue]="1000000">1 Millón (Metrópolis)</option>
+              <option [ngValue]="5000000">5 Millones (Mega Ciudad)</option>
+              <option [ngValue]="10000000">10 Millones</option>
+              <option [ngValue]="50000000">50 Millones</option>
+           </select>
+        </div>
+
+
+
+        <div class="search-actions">
+          <button type="button" class="btn btn-primary" (click)="onSearch()">
+            <i class="fa fa-search"></i> Buscar
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="clearSearch()">
+            <i class="fa fa-times"></i> Limpiar
+          </button>
+        </div>
+      </div>
+      
+      <div class="destinations-container">
+        
+        <div *ngIf="loading" class="loading-overlay">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+
+        <div class="destinations-grid" *ngIf="!loading && destinations.length > 0">
+          
+          <div class="destination-card" *ngFor="let city of destinations">
+
+            <div class="rating-badge" *ngIf="cityStats[city.id] && cityStats[city.id].totalCount > 0">
+               <i class="fa fa-star text-warning"></i>
+               <span class="fw-bold ms-1">{{ cityStats[city.id].averageScore | number:'1.1-1' }}</span>
+            </div>
+
+            <div class="destination-content">
+              <h3 class="destination-name" [title]="city.name">
+                {{ city.name }}
+              </h3>
+
+              <div class="destination-info">
+                <div class="info-row">
+                  <span class="info-label"><i class="fa fa-globe me-2"></i> País:</span>
+                  <span class="info-value">{{ city.country }}</span>
+                </div>
+
+                <div class="info-row" *ngIf="city.region">
+                  <span class="info-label"><i class="fa fa-map me-2"></i> Región:</span>
+                  <span class="info-value">{{ city.region }}</span>
+                </div>
+
+
+                <div class="info-row">
+                  <span class="info-label"><i class="fa fa-users me-2"></i> Población:</span>
+                  <span class="info-value">{{ formatPopulation(city.population) }}</span>
+                </div>
+
+                <div class="info-row">
+                  <span class="info-label"><i class="fa fa-map-pin me-2"></i> Coordenadas:</span>
+                  <span class="info-value coordinates">{{ formatCoordinates(city.coordinates) }}</span>
+                </div>
+              </div>
+
+              <div class="destination-actions d-grid gap-2">
+                
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="openInMaps(city)" title="Ver en Mapa">
+                  <i class="fa fa-map-marked-alt me-1"></i> Ver Mapa
+                </button>
+
+                <button type="button" 
+                        class="btn btn-sm" 
+                        [ngClass]="myReviews[city.id] ? 'btn-warning' : 'btn-outline-primary'"
+                        (click)="openRateModal(rateModal, city)">
+                   <i class="fa" [ngClass]="myReviews[city.id] ? 'fa-pencil' : 'fa-star'"></i>
+                   {{ myReviews[city.id] ? 'Editar mi Reseña' : 'Calificar' }}
+                </button>
+
+                <button type="button" class="btn btn-sm btn-info text-white" (click)="openReviewsModal(reviewsListModal, city)">
+                   <i class="fa fa-comments me-1"></i> Ver Reseñas 
+                   <span *ngIf="cityStats[city.id]" class="badge bg-white text-black shadow-sm ms-1 fw-bold">
+                      {{ cityStats[city.id].totalCount }}
+                   </span>
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!loading && destinations.length === 0" class="empty-state">
+          <i class="fa fa-search fa-3x mb-3"></i>
+          <h4>Sin resultados</h4>
+          <p>Ingresá un término de búsqueda (mínimo 3 caracteres) y presioná "Buscar".</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #rateModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ currentReviewId ? 'Editar Reseña' : 'Calificar Destino' }}
+      <small class="text-muted d-block fs-6">{{ selectedCity?.name }}</small>
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body text-center">
+    
+    <div class="mb-3">
+       <label class="d-block mb-2 fw-bold">Tu Puntuación</label>
+       <div class="fs-2 text-warning" style="cursor: pointer;">
+          <i *ngFor="let s of stars" 
+             class="fa me-2 transition-transform"
+             [ngClass]="s <= currentRatingForm.score ? 'fa-star' : 'fa-star-o'"
+             (click)="setScore(s)"></i>
+       </div>
+    </div>
+
+    <div class="form-group text-start">
+       <label class="fw-bold mb-1">Tu Comentario</label>
+       <textarea class="form-control" rows="3" [(ngModel)]="currentRatingForm.comment" placeholder="¿Qué te pareció este lugar?"></textarea>
+    </div>
+
+  </div>
+  <div class="modal-footer justify-content-between">
+    <div>
+       <button *ngIf="currentReviewId" type="button" class="btn btn-outline-danger" (click)="deleteRating(modal)">
+          <i class="fa fa-trash"></i> Eliminar
+       </button>
+    </div>
+    <div>
+       <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Cancelar</button>
+       <button type="button" class="btn btn-primary" (click)="saveRating(modal)">Guardar</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #reviewsListModal let-modal>
+  <div class="modal-header bg-info text-white">
+    <h5 class="modal-title text-white">
+       Reseñas de {{ selectedCity?.name }}
+       <span class="badge bg-light text-dark ms-2" *ngIf="cityStats[selectedCity?.id!]">
+          {{ cityStats[selectedCity?.id!].averageScore | number:'1.1-1' }} <i class="fa fa-star text-warning"></i>
+       </span>
+    </h5>
+    <button type="button" class="btn-close btn-close-white" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body p-0">
+    
+    <div *ngIf="loadingReviews" class="text-center p-5">
+       <div class="spinner-border text-info" role="status"></div>
+    </div>
+
+    <div *ngIf="!loadingReviews && cityReviewsList.length === 0" class="text-center p-5 text-muted">
+       <i class="fa fa-comment-slash fa-3x mb-3"></i>
+       <p>Aún no hay reseñas para este destino.</p>
+    </div>
+
+    <div *ngIf="!loadingReviews && cityReviewsList.length > 0" class="list-group list-group-flush">
+       <div class="list-group-item p-3" *ngFor="let review of cityReviewsList">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+             <h6 class="mb-0 fw-bold">{{ review.userName || 'Usuario' }}</h6>
+             <div class="text-warning small">
+                <i *ngFor="let s of stars" class="fa" [ngClass]="s <= review.score ? 'fa-star' : 'fa-star-o'"></i>
+             </div>
+          </div>
+          <p class="mb-0 text-secondary">{{ review.comment }}</p>
+       </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Cerrar</button>
+  </div>
+</ng-template>

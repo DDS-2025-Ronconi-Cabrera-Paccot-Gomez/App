@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>TravelPro</RootNamespace>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TravelPro.Application.Contracts\TravelPro.Application.Contracts.csproj" />
+    <ProjectReference Include="..\TravelPro.Application\TravelPro.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.SettingManagement.HttpApi" Version="9.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Identity.HttpApi" Version="9.3.2" />
+    <PackageReference Include="Volo.Abp.Account.HttpApi" Version="9.3.2" />
+  </ItemGroup>
+
+</Project>
