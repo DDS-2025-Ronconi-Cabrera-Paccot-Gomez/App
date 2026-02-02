@@ -21,6 +21,7 @@ export class PublicProfileComponent implements OnInit {
   userProfile: PublicProfileDto | null = null;
   loading = true;
   error = false;
+   readonly defaultAvatar = 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541';
 
   ngOnInit() {
     // Nos suscribimos a los cambios en la URL
@@ -47,6 +48,9 @@ export class PublicProfileComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+  onImageError(event: any) {
+    event.target.src = this.defaultAvatar;
   }
   goBack(): void {
     this.location.back();

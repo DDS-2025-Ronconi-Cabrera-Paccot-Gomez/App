@@ -72,3 +72,37 @@ h3 {
     margin: 3px 0;
 }
 
+.profile-img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover; /* Esto asegura que la foto no se deforme aunque no sea cuadrada */
+  border: 4px solid #fff; /* Borde blanco elegante */
+  background-color: #f8f9fa; /* Fondo gris por si la imagen es transparente */
+}
+
+/* Botón flotante para subir foto */
+.upload-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  background-color: #0d6efd; /* Color primario */
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+
+  &:hover {
+    transform: scale(1.1);
+    background-color: #0b5ed7;
+  }
+}
+
+.card {
+  border-radius: 12px; /* Bordes redondeados modernos */
+}

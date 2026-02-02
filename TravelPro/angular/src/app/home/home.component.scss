@@ -1,27 +1,45 @@
-/* Styles for the home component */
-.card-bg-image {
-  position: absolute;
-  width: 630px;
-  height: auto;
-  bottom: 0;
-  right: 0;
-  z-index: 1;
+.home-container {
+  margin-top: 3rem;
+  margin-bottom: 5rem;
 }
 
-.starting-content {
-  position: relative;
-  z-index: 2;
+.hero-section {
+  background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+  border: 1px solid #f0f0f0;
 }
 
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%; /* Círculo perfecto */
+}
 
-@media (min-width: 1199px) {
-  .h-lg-100 {
-    height: 100% !important;
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Efecto Hover para las tarjetas */
+.hover-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-10px); /* Se mueve hacia arriba */
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.15)!important; /* Sombra más fuerte */
+  
+  /* Hacemos que el botón cambie de color al hacer hover en la tarjeta */
+  .btn-outline-primary {
+    background-color: #0d6efd;
+    color: white;
   }
-}
-
-@media (min-width: 768px) {
-  .h-md-100 {
-    height: 100% !important;
+  .btn-outline-warning {
+    background-color: #ffc107;
+  }
+  .btn-outline-info {
+    background-color: #0dcaf0;
+    color: white;
   }
 }
